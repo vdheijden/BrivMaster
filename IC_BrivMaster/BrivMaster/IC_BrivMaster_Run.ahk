@@ -224,6 +224,7 @@ class IC_BrivMaster_GemFarm_Class
 				this.levelManager.LevelClickDamage() ;Probably done whilst waiting for Thellora, but not guaranteed
 				g_SharedData.UpdateOutbound("LoopString","Ellywick's Casino")
 				unlockRequired:=this.EllywickCasino.Casino()
+				g_SharedData.UpdateOutbound("LoopString","Casino Done")
 				if (this.RouteMaster.IsFeatSwap()) ;Swap formation here as we can't be blocked in the transition
 				{
 					this.RouteMaster.StartAutoProgressSoft() ;Start moving ASAP
@@ -252,6 +253,7 @@ class IC_BrivMaster_GemFarm_Class
 				this.levelManager.LevelClickDamage()
 				if(this.EllywickCasino.Casino()) ;Moved this out of the IBM_EllywickCasino end logic, for non-combine unlock right away as if the zone is somehow not complete Briv won't be present to get 'free' stacks anyway | TODO: Think about ghost levelling in this case
 					this.EllywickCasino.UnlockHeroes()
+				g_SharedData.UpdateOutbound("LoopString","Casino Done")
 				quest:=g_SF.Memory.ReadQuestRemaining() ;Wait for zone completion so we can level Briv - TODO: this should perhaps have a timeout in case things get weird (no familiars in modron formation? Which would mean no gold anyway)
 				while(quest>0)
 				{

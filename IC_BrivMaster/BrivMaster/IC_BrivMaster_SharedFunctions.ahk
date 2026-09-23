@@ -131,12 +131,20 @@ class IC_BrivMaster_SharedData_Class ;In the shared file as the SettingsPath sta
 		g_IBM.RefreshGemFarmWindow()
     }
 
-	UpdateOutbound(key,value) ;Update if the value has changed at mark the outbound data as dirty
+	UpdateOutbound(key,value) ;Update if the value has changed and mark the outbound data as dirty
 	{
 		if (this[key]!=value)
 		{
 			this[key]:=value
 			this.IBM_OutboundDirty:=true
+
+			if (IsObject(g_IBM) && IsObject(g_IBM.Logger))
+			{
+				logValue:=value
+				if (IsObject(logValue))
+					logValue:=AHK_JSON.Dump(logValue)
+				g_IBM.Logger.AddMessage("Outbound[" . key . "]=" . logValue)
+			}
 		}
 	}
 
