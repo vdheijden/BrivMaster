@@ -208,7 +208,9 @@ class IC_BrivMaster_GemFarm_Class
 	{
 		if (currentZone==1)
 		{
+			g_SharedData.UpdateOutbound("LoopString","z1 started")
 			this.RouteMaster.ToggleAutoProgress(0,false,true)
+			g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress(0,false,true)")
 			if (g_IBM_Settings["IBM_Level_Diana_Cheese"] AND this.DianaCheeseHelper.InWindow()) ;Diana can give excess chests after the daily reset, as it seems things don't get synced up until a restart. Level her to 200 only in that window
 				this.levelManager.OverrideLevelByIDRaiseToMin(148,"min",200)
 			if (g_Heroes[139].inM) ;Thellora in M, either combining or non-combining followed by Casino, which proceed in the same way but with Briv's z1c set when not combining
@@ -256,6 +258,7 @@ class IC_BrivMaster_GemFarm_Class
 					this.EllywickCasino.UnlockHeroes()
 				g_SharedData.UpdateOutbound("LoopString","Casino Done - No Thellora")
 				this.RouteMaster.ToggleAutoProgress(0, false, true)
+				g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress(0,false,true)")
 				quest:=g_SF.Memory.ReadQuestRemaining() ;Wait for zone completion so we can level Briv - TODO: this should perhaps have a timeout in case things get weird (no familiars in modron formation? Which would mean no gold anyway)
 				while(quest>0)
 				{
