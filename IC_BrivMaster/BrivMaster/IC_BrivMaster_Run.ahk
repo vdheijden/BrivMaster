@@ -208,6 +208,7 @@ class IC_BrivMaster_GemFarm_Class
 	{
 		if (currentZone==1)
 		{
+			this.RouteMaster.ToggleAutoProgress(0,false,true)
 			if (g_IBM_Settings["IBM_Level_Diana_Cheese"] AND this.DianaCheeseHelper.InWindow()) ;Diana can give excess chests after the daily reset, as it seems things don't get synced up until a restart. Level her to 200 only in that window
 				this.levelManager.OverrideLevelByIDRaiseToMin(148,"min",200)
 			if (g_Heroes[139].inM) ;Thellora in M, either combining or non-combining followed by Casino, which proceed in the same way but with Briv's z1c set when not combining
@@ -249,11 +250,12 @@ class IC_BrivMaster_GemFarm_Class
 			{
 				this.EllywickCasino.lockedFrontColumnChamps:=this.levelManager.SetupFirstZoneFrontRow()
 				this.levelManager.LevelFormation("M","z1",,true,,true)
-				g_SharedData.UpdateOutbound("LoopString","Ellywick's Casino")
+				g_SharedData.UpdateOutbound("LoopString","Ellywick's Casino - No Thellora")
 				this.levelManager.LevelClickDamage()
 				if(this.EllywickCasino.Casino()) ;Moved this out of the IBM_EllywickCasino end logic, for non-combine unlock right away as if the zone is somehow not complete Briv won't be present to get 'free' stacks anyway | TODO: Think about ghost levelling in this case
 					this.EllywickCasino.UnlockHeroes()
-				g_SharedData.UpdateOutbound("LoopString","Casino Done")
+				g_SharedData.UpdateOutbound("LoopString","Casino Done - No Thellora")
+				this.RouteMaster.ToggleAutoProgress(0, false, true)
 				quest:=g_SF.Memory.ReadQuestRemaining() ;Wait for zone completion so we can level Briv - TODO: this should perhaps have a timeout in case things get weird (no familiars in modron formation? Which would mean no gold anyway)
 				while(quest>0)
 				{
@@ -273,7 +275,7 @@ class IC_BrivMaster_GemFarm_Class
 				this.levelManager.LevelFormation("Q","min",0) ;One tap of levelling after the change so that BBEG->Dyna swap or such happens
 				if (g_Heroes[139].inQ OR g_Heroes[139].inE)
 				{
-					this.DoRushWait()
+					this.DoRushWait(true)
 					this.RouteMaster.UpdateThellora()
 				}
 			}
