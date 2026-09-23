@@ -142,12 +142,12 @@ class IC_BrivMaster_RouteMaster_Class ;A class for managing routes
 	GetTargetStacks(ignoreHaste:=false, forceRecalc:=false) ;Number of Steelbones stacks needed for the next run. Ignore haste is used for the status string showing the expected per run stack usage, rather than in-run calculation
 	{
 		if(ignoreHaste)
-			return this.GetTargetStacksForFullRun(true)
+			return CEIL(this.GetTargetStacksForFullRun(true) * 1.2)
 		else
 		{
 			this.UpdateLeftoverHaste(forceRecalc)
 			stacksToGenerate:=this.GetTargetStacksForFullRun() - this.leftoverHaste
-			return CEIL(stacksToGenerate / this.stackConversionRate) ;Ceiling as the feat rounds down
+			return CEIL(stacksToGenerate / this.stackConversionRate * 1.2) ;Ceiling as the feat rounds down
 		}
 	}
 
