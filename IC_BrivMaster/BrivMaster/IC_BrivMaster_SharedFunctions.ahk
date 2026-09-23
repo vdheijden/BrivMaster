@@ -94,6 +94,9 @@ class IC_BrivMaster_SharedData_Class ;In the shared file as the SettingsPath sta
 		this.RunLog:=""
 		this.LoopString:=""
 		this.LastCloseReason:=""
+		this.OutboundLogPath:=A_LineFile . "\..\..\Logs\OutboundLog.txt"
+		if (!FileExist(A_LineFile . "\..\..\Logs"))
+			FileCreateDir, % A_LineFile . "\..\..\Logs"
 	}
 
 	Close() ;Taken from what was IC_BrivGemFarmRun_SharedData_Class in IC_BrivGemFarm_Run.ahk
@@ -138,13 +141,11 @@ class IC_BrivMaster_SharedData_Class ;In the shared file as the SettingsPath sta
 			this[key]:=value
 			this.IBM_OutboundDirty:=true
 
-			if (IsObject(g_IBM) && IsObject(g_IBM.Logger))
-			{
-				logValue:=value
-				if (IsObject(logValue))
-					logValue:=AHK_JSON.Dump(logValue)
-				g_IBM.Logger.AddMessage("Outbound[" . key . "]=" . logValue)
-			}
+			logValue:=value
+			if (IsObject(logValue))
+				logValue:=AHK_JSON.Dump(logValue)
+			FormatTime, outboundTime, %A_Now%, yyyy-MM-dd HH:mm:ss
+			FileAppend, % outboundTime . " | " . key . " = " . logValue . "`n", % this.OutboundLogPath
 		}
 	}
 
