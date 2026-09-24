@@ -963,7 +963,7 @@
 		;Advanced
 		GuiControl, IBM_Home:, IBM_Casino_Timeout_Base, % g_IBM_Settings.IBM_Casino_Timeout_Base
 		GuiControl, IBM_Home:, IBM_ToggleAutoProgress_Timeout, % g_IBM_Settings.IBM_ToggleAutoProgress_Timeout
-		GuiControl, IBM_Home:, IBM_GetTargetStacks_Multiplier, % g_IBM_Settings.IBM_GetTargetStacks_Multiplier
+		GuiControl, IBM_Home:, IBM_GetTargetStacks_Multiplier, % Round(g_IBM_Settings.IBM_GetTargetStacks_Multiplier, 2)
 
 		;BM LEVELS TAB
 
@@ -1459,7 +1459,7 @@ IBM_Generic_Setting_Float() ;Generic g-label for non-hub settings that should be
 	GuiControlGet, value, , %A_GuiControl%
 	value:=Round(value+0, 2)
 	g_IBM_Settings[A_GuiControl]:=value
-	GuiControl, IBM_Home:, %A_GuiControl%, %value%
+	GuiControl, IBM_Home:, %A_GuiControl%, % value
 }
 
 IBM_Generic_Hub_Setting_Int() ;Hub version
