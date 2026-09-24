@@ -624,7 +624,7 @@ class IC_BrivMaster_RouteMaster_Class ;A class for managing routes
 			if(activateFariUlt) ;InitMemoryReads must come after formation switch so Tatyana's effect handler is available
 				this.InitMemoryReads()
 			g_SharedData.UpdateOutbound("LoopString","Online Stack")
-			maxOnlineStackTime:=(200000*g_IBM.CounterFrequency)/gameSpeed ;Reduces the 200s to 16s @ 12.5. Factoring the CounterFrequency in here means we can avoid doing it every loop
+			maxOnlineStackTime:=(2000000*g_IBM.CounterFrequency)/gameSpeed ;Reduces the 200s to 16s @ 12.5. Factoring the CounterFrequency in here means we can avoid doing it every loop
 			if(g_IBM.failedConversionMode) ;In this case we're probably killing things as we've levelled champions, allow significantly more time
 				maxOnlineStackTime*=5
 			elapsedTime:=0
@@ -1301,17 +1301,21 @@ class IC_BrivMaster_RouteMaster_Class ;A class for managing routes
 	; IsToggled is 0 for off or 1 for on. ForceToggle always hits G. ForceState will press G until AutoProgress is read as on (<5s).
     ToggleAutoProgress( isToggled := 1, forceToggle := false, forceState := false )
     {
+		g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress START to " . (isToggled ? "ON" : "OFF") . (forceToggle ? " (forced)" : "") . (forceState ? " (forced state)" : ""))
         Critical, On
         StartTime:=A_TickCount
         if ( forceToggle )
             this.KEY_autoProgress.KeyPress()
         if ( g_SF.Memory.ReadAutoProgressToggled() != isToggled )
             this.KEY_autoProgress.KeyPress() ;Irisiri: If forceToggle is true, this will be a 2nd press without giving the game a chance to process?
-        while ( g_SF.Memory.ReadAutoProgressToggled() != isToggled AND forceState AND A_TickCount - StartTime < 1000 )
+        while ( g_SF.Memory.ReadAutoProgressToggled() != isToggled AND forceState AND A_TickCount - StartTime < 25000 )
         {
+			g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress waiting for state to change " . g_SF.Memory.ReadAutoProgressToggled())
             this.KEY_autoProgress.KeyPress_Bulk()
 			g_IBM.IBM_Sleep(15)
         }
+		g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress end state " . g_SF.Memory.ReadAutoProgressToggled() . " tickCount " . A_TickCount - StartTime)
+		g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress END to " . (isToggled ? "ON" : "OFF") . (forceToggle ? " (forced)" : "") . (forceState ? " (forced state)" : ""))
         Critical, Off
     }
 	

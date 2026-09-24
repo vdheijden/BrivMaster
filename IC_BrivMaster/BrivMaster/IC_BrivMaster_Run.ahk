@@ -124,7 +124,9 @@ class IC_BrivMaster_GemFarm_Class
 				}
 				this.Logger.NewRun()
 				this.currentZone:=this.WaitForZoneLoad(this.currentZone)
-				this.RouteMaster.ToggleAutoProgress(g_Heroes[139].inM ? 1 : 0) ;Set initial autoprogess ASAP
+				;this.RouteMaster.ToggleAutoProgress(g_Heroes[139].inM ? 1 : 0) ;Set initial autoprogess ASAP
+				this.RouteMaster.ToggleAutoProgress(0,false,true)
+				g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress(0,false,true) - Set initial autoprogess ASAP")
 				this.offRamp:=false ;TODO: There's a lot of resetting that could probably be wrapped together. Or possibly this whole block carved out
 				this.failedConversionMode:=false
                 this.levelManager.Reset()
@@ -208,7 +210,9 @@ class IC_BrivMaster_GemFarm_Class
 	{
 		if (currentZone==1)
 		{
+
 			g_SharedData.UpdateOutbound("LoopString","z1 started")
+			g_SharedData.UpdateOutbound("HasteStacks", g_Heroes[58].ReadHasteStacks())
 			this.RouteMaster.ToggleAutoProgress(0,false,true)
 			g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress(0,false,true)")
 			if (g_IBM_Settings["IBM_Level_Diana_Cheese"] AND this.DianaCheeseHelper.InWindow()) ;Diana can give excess chests after the daily reset, as it seems things don't get synced up until a restart. Level her to 200 only in that window

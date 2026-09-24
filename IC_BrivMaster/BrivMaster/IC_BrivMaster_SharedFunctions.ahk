@@ -94,6 +94,7 @@ class IC_BrivMaster_SharedData_Class ;In the shared file as the SettingsPath sta
 		this.RunLog:=""
 		this.LoopString:=""
 		this.LastCloseReason:=""
+		this.RunStartTime:=A_TickCount
 		this.OutboundLogPath:=A_LineFile . "\..\..\Logs\OutboundLog.txt"
 		if (!FileExist(A_LineFile . "\..\..\Logs"))
 			FileCreateDir, % A_LineFile . "\..\..\Logs"
@@ -144,8 +145,9 @@ class IC_BrivMaster_SharedData_Class ;In the shared file as the SettingsPath sta
 			logValue:=value
 			if (IsObject(logValue))
 				logValue:=AHK_JSON.Dump(logValue)
-			FormatTime, outboundTime, %A_Now%, yyyy-MM-dd HH:mm:ss
-			FileAppend, % outboundTime . " | " . key . " = " . logValue . "`n", % this.OutboundLogPath
+			currentZone:=g_SF.Memory.ReadCurrentZone()
+			elapsedSeconds:=Round((A_TickCount - this.RunStartTime) / 1000, 2)
+			FileAppend, % elapsedSeconds . "s | z" . currentZone . " | " . key . " = " . logValue . "`n", % this.OutboundLogPath
 		}
 	}
 

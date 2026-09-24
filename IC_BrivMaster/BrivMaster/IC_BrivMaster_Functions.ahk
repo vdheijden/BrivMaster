@@ -277,6 +277,7 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 	NewRun()
 	{
 		startTime:=A_TickCount ;So it doesn't change between entries
+		g_SharedData.RunStartTime:=startTime
 		if (this.LogEntries.HasKey("Run")) ;There will be no entry for the first run
 		{
 			this.LogEntries.Run.End:=startTime
