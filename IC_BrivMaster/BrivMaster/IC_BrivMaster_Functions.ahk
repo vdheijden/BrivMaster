@@ -7,6 +7,7 @@ class IC_BrivMaster_EllywickCasino_Class ;A class to manage the whole casino, wi
 	
 	__New()
 	{
+		IC_BrivMaster_EllywickCasino_Class.TIMEOUT_BASE:=g_IBM_Settings["IBM_Casino_Timeout_Base"] ? g_IBM_Settings["IBM_Casino_Timeout_Base"] : 100000
 		if(g_Heroes[139].inM)
 		{
 			this.ghostLevelling:=g_IBM_Settings["IBM_Level_Options_Ghost"] ;Ghost levelling applies only where Thellora is in M, as we have Briv present in the full Casino in this case

@@ -141,13 +141,14 @@ class IC_BrivMaster_RouteMaster_Class ;A class for managing routes
 
 	GetTargetStacks(ignoreHaste:=false, forceRecalc:=false) ;Number of Steelbones stacks needed for the next run. Ignore haste is used for the status string showing the expected per run stack usage, rather than in-run calculation
 	{
+		targetMultiplier:=g_IBM_Settings["IBM_GetTargetStacks_Multiplier"] ? g_IBM_Settings["IBM_GetTargetStacks_Multiplier"] : 1.0
 		if(ignoreHaste)
-			return CEIL(this.GetTargetStacksForFullRun(true) * 1.2)
+			return CEIL(this.GetTargetStacksForFullRun(true) * targetMultiplier)
 		else
 		{
 			this.UpdateLeftoverHaste(forceRecalc)
 			stacksToGenerate:=this.GetTargetStacksForFullRun() - this.leftoverHaste
-			return CEIL(stacksToGenerate / this.stackConversionRate * 1.2) ;Ceiling as the feat rounds down
+			return CEIL(stacksToGenerate / this.stackConversionRate * targetMultiplier) ;Ceiling as the feat rounds down
 		}
 	}
 
@@ -1308,7 +1309,8 @@ class IC_BrivMaster_RouteMaster_Class ;A class for managing routes
             this.KEY_autoProgress.KeyPress()
         if ( g_SF.Memory.ReadAutoProgressToggled() != isToggled )
             this.KEY_autoProgress.KeyPress() ;Irisiri: If forceToggle is true, this will be a 2nd press without giving the game a chance to process?
-        while ( g_SF.Memory.ReadAutoProgressToggled() != isToggled AND forceState AND A_TickCount - StartTime < 25000 )
+        maxWait:=g_IBM_Settings["IBM_ToggleAutoProgress_Timeout"] ? g_IBM_Settings["IBM_ToggleAutoProgress_Timeout"] : 25000
+        while ( g_SF.Memory.ReadAutoProgressToggled() != isToggled AND forceState AND A_TickCount - StartTime < maxWait )
         {
 			g_IBM.Logger.LogDebug("ToggleAutoProgress(" . isToggled . "," . forceToggle . "," . forceState . ") waiting for state to change - Elapsed Ticks: " . A_TickCount - StartTime . ", Current Value: " . g_SF.Memory.ReadAutoProgressToggled())
             this.KEY_autoProgress.KeyPress_Bulk()

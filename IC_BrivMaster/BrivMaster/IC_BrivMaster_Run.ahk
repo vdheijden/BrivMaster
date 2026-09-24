@@ -227,9 +227,9 @@ class IC_BrivMaster_GemFarm_Class
 				this.levelManager.LevelFormation("M","min") ;Level M to minimum
 				this.RouteMaster.UpdateThellora()
 				this.levelManager.LevelClickDamage() ;Probably done whilst waiting for Thellora, but not guaranteed
-				g_SharedData.UpdateOutbound("LoopString","Ellywick's Casino")
+				g_SharedData.UpdateOutbound("LoopString","Ellywick's Casino - Thellora")
 				unlockRequired:=this.EllywickCasino.Casino()
-				g_SharedData.UpdateOutbound("LoopString","Casino Done")
+				g_SharedData.UpdateOutbound("LoopString","Casino Done - Thellora")
 				if (this.RouteMaster.IsFeatSwap()) ;Swap formation here as we can't be blocked in the transition
 				{
 					this.RouteMaster.StartAutoProgressSoft() ;Start moving ASAP
