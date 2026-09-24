@@ -771,11 +771,10 @@
 		this.AddToolTip("IBM_Casino_Timeout_Base", "Overrides the Ellywick Casino timeout base used by the class-level TIMEOUT_BASE constant. Increase this if the casino loop is expiring before the hand resolves.")
 		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, ToggleAutoProgress wait:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w70 x+3 Number Limit6 vIBM_ToggleAutoProgress_Timeout gIBM_Generic_Setting_Int
-		Gui, IBM_Home:Add, Text, x+5 h18 0x200, ms
-		this.AddToolTip("IBM_ToggleAutoProgress_Timeout", "Maximum time in milliseconds for ToggleAutoProgress() to confirm the requested auto-progress state before continuing. Default is 25000 ms.")
+		this.AddToolTip("IBM_ToggleAutoProgress_Timeout", "Maximum time in milliseconds for ToggleAutoProgress() to confirm the requested auto-progress state before continuing.")
 		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, GetTargetStacks multiplier:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w55 x+3 Number Limit5 vIBM_GetTargetStacks_Multiplier gIBM_Generic_Setting_Int
-		this.AddToolTip("IBM_GetTargetStacks_Multiplier", "Safety multiplier applied when calculating the target Steelbones stacks for the next run. Default is 1.2.")
+		this.AddToolTip("IBM_GetTargetStacks_Multiplier", "Safety multiplier applied when calculating the target Steelbones stacks for the next run.")
 
 		;++++++++++++++++++LEVELS TAB++++++++++++++++++
 		Gui, IBM_Home:Tab, Levels
@@ -809,7 +808,7 @@
 		nextGroupStart:=groupPosY+groupPosH+1
 		;Level manager - headings
 		Gui, IBM_Home:Font, w700
-		Gui, IBM_Home:Add, Groupbox, Section xm+2 y%nextGroupStart% w%groupWidth% h70 vIBM_LevelManager, Level Manager
+		Gui, IBM_Home:Add, Groupbox, Section xm+2 y%nextGroupStart% w%groupWidth% h75 vIBM_LevelManager, Level Manager
 		Gui, IBM_Home:Font, w400
 		if(this.Wide) ;The refresh button will be placed to the right
 		{
