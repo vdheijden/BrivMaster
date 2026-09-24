@@ -764,7 +764,7 @@
 		;++++++++++++++++++ADVANCED TAB++++++++++++++++++
 		Gui, IBM_Home:Tab, Advanced
 		Gui, IBM_Home:Font, w700
-		Gui, IBM_Home:Add, Groupbox, Section xm+2 ym+48 w%groupWidth% h125 vIBM_Group_Advanced, Advanced
+		Gui, IBM_Home:Add, Groupbox, Section xm+2 ym+48 w%groupWidth% h150 vIBM_Group_Advanced, Advanced
 		Gui, IBM_Home:Font, w400
 		Gui, IBM_Home:Add, Text, xs+10 ys+20 h18 0x200, Casino timeout base:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Casino_Timeout_Base gIBM_Generic_Setting_Int
@@ -772,9 +772,12 @@
 		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, ToggleAutoProgress wait:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w70 x+3 Number Limit6 vIBM_ToggleAutoProgress_Timeout gIBM_Generic_Setting_Int
 		this.AddToolTip("IBM_ToggleAutoProgress_Timeout", "Maximum time in milliseconds for ToggleAutoProgress() to confirm the requested auto-progress state before continuing.")
-		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, GetTargetStacks multiplier:
+		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, SB stack buffer multiplier:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w55 x+3 Number Limit5 vIBM_GetTargetStacks_Multiplier gIBM_Generic_Setting_Float
 		this.AddToolTip("IBM_GetTargetStacks_Multiplier", "Safety multiplier applied when calculating the target Steelbones stacks for the next run. Up to two decimal places.")
+		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, Max online stack time:
+		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Online_Stack_Max_Time gIBM_Generic_Setting_Int
+		this.AddToolTip("IBM_Online_Stack_Max_Time", "Maximum online stack time before the run is restarted. This value is used in the same base unit as the runtime maxOnlineStackTime calculation.")
 
 		;++++++++++++++++++LEVELS TAB++++++++++++++++++
 		Gui, IBM_Home:Tab, Levels
@@ -964,6 +967,7 @@
 		GuiControl, IBM_Home:, IBM_Casino_Timeout_Base, % g_IBM_Settings.IBM_Casino_Timeout_Base
 		GuiControl, IBM_Home:, IBM_ToggleAutoProgress_Timeout, % g_IBM_Settings.IBM_ToggleAutoProgress_Timeout
 		GuiControl, IBM_Home:, IBM_GetTargetStacks_Multiplier, % Round(g_IBM_Settings.IBM_GetTargetStacks_Multiplier, 2)
+		GuiControl, IBM_Home:, IBM_Online_Stack_Max_Time, % g_IBM_Settings.IBM_Online_Stack_Max_Time
 
 		;BM LEVELS TAB
 

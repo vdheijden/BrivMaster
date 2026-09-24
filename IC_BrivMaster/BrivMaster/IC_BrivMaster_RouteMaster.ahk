@@ -625,7 +625,8 @@ class IC_BrivMaster_RouteMaster_Class ;A class for managing routes
 			if(activateFariUlt) ;InitMemoryReads must come after formation switch so Tatyana's effect handler is available
 				this.InitMemoryReads()
 			g_SharedData.UpdateOutbound("LoopString","Online Stack")
-			maxOnlineStackTime:=(2000000*g_IBM.CounterFrequency)/gameSpeed ;Reduces the 200s to 16s @ 12.5. Factoring the CounterFrequency in here means we can avoid doing it every loop
+			maxOnlineStackTimeFactor:=g_IBM_Settings["IBM_Online_Stack_Max_Time"] ? g_IBM_Settings["IBM_Online_Stack_Max_Time"] : 200000
+			maxOnlineStackTime:=(maxOnlineStackTimeFactor*g_IBM.CounterFrequency)/gameSpeed ;Convert the configured maximum from ms to counter ticks, scaled to game speed. The original 2000000ms base is the default when unset.
 			if(g_IBM.failedConversionMode) ;In this case we're probably killing things as we've levelled champions, allow significantly more time
 				maxOnlineStackTime*=5
 			elapsedTime:=0

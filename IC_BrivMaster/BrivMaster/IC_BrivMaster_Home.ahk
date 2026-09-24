@@ -166,6 +166,7 @@ Class IC_IriBrivMaster_Component
 		settings.IBM_OffLine_Delay_Time["_DEFAULT"]:=15000
 		settings.IBM_ToggleAutoProgress_Timeout["_DEFAULT"]:=1000
 		settings.IBM_GetTargetStacks_Multiplier["_DEFAULT"]:=1.0
+		settings.IBM_Online_Stack_Max_Time["_DEFAULT"]:=200000
 		settings.IBM_OffLine_Sleep_Time["_DEFAULT"]:=0
 		settings.IBM_Level_Options_Mod_Key["_DEFAULT"]:="Shift"
 		settings.IBM_Level_Options_Mod_Value["_DEFAULT"]:=10
