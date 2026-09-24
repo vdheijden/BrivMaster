@@ -135,19 +135,23 @@ class IC_BrivMaster_SharedData_Class ;In the shared file as the SettingsPath sta
 		g_IBM.RefreshGemFarmWindow()
     }
 
+	LogValue(value)
+	{
+		logValue:=value
+		if (IsObject(logValue))
+			logValue:=AHK_JSON.Dump(logValue)
+		currentZone:=g_SF.Memory.ReadCurrentZone()
+		elapsedSeconds:=Round((A_TickCount - this.RunStartTime) / 1000, 2)
+		FileAppend, % elapsedSeconds . "s | z" . currentZone . " | " . logValue . "`n", % this.OutboundLogPath
+	}
+
 	UpdateOutbound(key,value) ;Update if the value has changed and mark the outbound data as dirty
 	{
 		if (this[key]!=value)
 		{
 			this[key]:=value
 			this.IBM_OutboundDirty:=true
-
-			logValue:=value
-			if (IsObject(logValue))
-				logValue:=AHK_JSON.Dump(logValue)
-			currentZone:=g_SF.Memory.ReadCurrentZone()
-			elapsedSeconds:=Round((A_TickCount - this.RunStartTime) / 1000, 2)
-			FileAppend, % elapsedSeconds . "s | z" . currentZone . " | " . key . " = " . logValue . "`n", % this.OutboundLogPath
+			this.LogValue(key . " = " . value)
 		}
 	}
 

@@ -1301,7 +1301,7 @@ class IC_BrivMaster_RouteMaster_Class ;A class for managing routes
 	; IsToggled is 0 for off or 1 for on. ForceToggle always hits G. ForceState will press G until AutoProgress is read as on (<5s).
     ToggleAutoProgress( isToggled := 1, forceToggle := false, forceState := false )
     {
-		g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress START to " . (isToggled ? "ON" : "OFF") . (forceToggle ? " (forced)" : "") . (forceState ? " (forced state)" : ""))
+		g_SharedData.LogValue("ToggleAutoProgress(" . isToggled . "," . forceToggle . "," . forceState . ") START")
         Critical, On
         StartTime:=A_TickCount
         if ( forceToggle )
@@ -1310,12 +1310,11 @@ class IC_BrivMaster_RouteMaster_Class ;A class for managing routes
             this.KEY_autoProgress.KeyPress() ;Irisiri: If forceToggle is true, this will be a 2nd press without giving the game a chance to process?
         while ( g_SF.Memory.ReadAutoProgressToggled() != isToggled AND forceState AND A_TickCount - StartTime < 25000 )
         {
-			g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress waiting for state to change " . g_SF.Memory.ReadAutoProgressToggled())
+			g_SharedData.LogValue("ToggleAutoProgress(" . isToggled . "," . forceToggle . "," . forceState . ") waiting for state to change - Elapsed Ticks: " . A_TickCount - StartTime . ", Current Value: " . g_SF.Memory.ReadAutoProgressToggled())
             this.KEY_autoProgress.KeyPress_Bulk()
 			g_IBM.IBM_Sleep(15)
         }
-		g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress end state " . g_SF.Memory.ReadAutoProgressToggled() . " tickCount " . A_TickCount - StartTime)
-		g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress END to " . (isToggled ? "ON" : "OFF") . (forceToggle ? " (forced)" : "") . (forceState ? " (forced state)" : ""))
+		g_SharedData.LogValue("ToggleAutoProgress(" . isToggled . "," . forceToggle . "," . forceState . ") END - Elapsed Ticks: " . A_TickCount - StartTime)
         Critical, Off
     }
 	
