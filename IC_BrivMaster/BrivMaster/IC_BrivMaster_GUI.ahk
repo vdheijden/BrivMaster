@@ -764,7 +764,7 @@
 		;++++++++++++++++++ADVANCED TAB++++++++++++++++++
 		Gui, IBM_Home:Tab, Advanced
 		Gui, IBM_Home:Font, w700
-		Gui, IBM_Home:Add, Groupbox, Section xm+2 ym+48 w%groupWidth% h95 vIBM_Group_Advanced, Advanced
+		Gui, IBM_Home:Add, Groupbox, Section xm+2 ym+48 w%groupWidth% h125 vIBM_Group_Advanced, Advanced
 		Gui, IBM_Home:Font, w400
 		Gui, IBM_Home:Add, Text, xs+10 ys+20 h18 0x200, Casino timeout base:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Casino_Timeout_Base gIBM_Generic_Setting_Int
@@ -808,7 +808,7 @@
 		nextGroupStart:=groupPosY+groupPosH+1
 		;Level manager - headings
 		Gui, IBM_Home:Font, w700
-		Gui, IBM_Home:Add, Groupbox, Section xm+2 y%nextGroupStart% w%groupWidth% h75 vIBM_LevelManager, Level Manager
+		Gui, IBM_Home:Add, Groupbox, Section xm+2 y%nextGroupStart% w%groupWidth% h70 vIBM_LevelManager, Level Manager
 		Gui, IBM_Home:Font, w400
 		if(this.Wide) ;The refresh button will be placed to the right
 		{
