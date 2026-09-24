@@ -773,8 +773,8 @@
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w70 x+3 Number Limit6 vIBM_ToggleAutoProgress_Timeout gIBM_Generic_Setting_Int
 		this.AddToolTip("IBM_ToggleAutoProgress_Timeout", "Maximum time in milliseconds for ToggleAutoProgress() to confirm the requested auto-progress state before continuing.")
 		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, GetTargetStacks multiplier:
-		Gui, IBM_Home:Add, Edit, +%editTextColour% w55 x+3 Number Limit5 vIBM_GetTargetStacks_Multiplier gIBM_Generic_Setting_Int
-		this.AddToolTip("IBM_GetTargetStacks_Multiplier", "Safety multiplier applied when calculating the target Steelbones stacks for the next run.")
+		Gui, IBM_Home:Add, Edit, +%editTextColour% w55 x+3 Number Limit5 vIBM_GetTargetStacks_Multiplier gIBM_Generic_Setting_Float
+		this.AddToolTip("IBM_GetTargetStacks_Multiplier", "Safety multiplier applied when calculating the target Steelbones stacks for the next run. Up to two decimal places.")
 
 		;++++++++++++++++++LEVELS TAB++++++++++++++++++
 		Gui, IBM_Home:Tab, Levels
@@ -1450,6 +1450,16 @@ IBM_Generic_Setting_String() ;Generic g-label for non-hub settings that should b
 		return
 	GuiControlGet, value, , %A_GuiControl%
     g_IBM_Settings[A_GuiControl]:=value . ""
+}
+
+IBM_Generic_Setting_Float() ;Generic g-label for non-hub settings that should be forced to Float and capped at 2 decimal places
+{
+	if (g_IriBrivMaster_GUI.controlLock)
+		return
+	GuiControlGet, value, , %A_GuiControl%
+	value:=Round(value+0, 2)
+	g_IBM_Settings[A_GuiControl]:=value
+	GuiControl, IBM_Home:, %A_GuiControl%, %value%
 }
 
 IBM_Generic_Hub_Setting_Int() ;Hub version
