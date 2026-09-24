@@ -95,7 +95,7 @@ class IC_BrivMaster_SharedData_Class ;In the shared file as the SettingsPath sta
 		this.LoopString:=""
 		this.LastCloseReason:=""
 		this.RunStartTime:=A_TickCount
-		this.OutboundLogPath:=A_LineFile . "\..\..\Logs\OutboundLog.txt"
+		this.DebugLogPath:=A_LineFile . "\..\..\Logs\DebugLog.txt"
 		if (!FileExist(A_LineFile . "\..\..\Logs"))
 			FileCreateDir, % A_LineFile . "\..\..\Logs"
 	}
@@ -135,23 +135,14 @@ class IC_BrivMaster_SharedData_Class ;In the shared file as the SettingsPath sta
 		g_IBM.RefreshGemFarmWindow()
     }
 
-	LogValue(value)
-	{
-		logValue:=value
-		if (IsObject(logValue))
-			logValue:=AHK_JSON.Dump(logValue)
-		currentZone:=g_SF.Memory.ReadCurrentZone()
-		elapsedSeconds:=Round((A_TickCount - this.RunStartTime) / 1000, 2)
-		FileAppend, % elapsedSeconds . "s | z" . currentZone . " | " . logValue . "`n", % this.OutboundLogPath
-	}
-
 	UpdateOutbound(key,value) ;Update if the value has changed and mark the outbound data as dirty
 	{
 		if (this[key]!=value)
 		{
 			this[key]:=value
 			this.IBM_OutboundDirty:=true
-			this.LogValue(key . " = " . value)
+			if (IsObject(g_IBM) && IsObject(g_IBM.Logger))
+				g_IBM.Logger.LogDebug(key . " = " . value)
 		}
 	}
 

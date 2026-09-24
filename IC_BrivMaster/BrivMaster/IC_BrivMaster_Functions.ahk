@@ -264,6 +264,7 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 			FileCreateDir, %logDir%
 		this.logBase:=logDir . "\RunLog_" . formattedDateTime ;A separate variable so other logs can use a matching start time, e.g. RunLog_20250101T000000.csv from this class and RunLog_20250101T000000_Relay.csv
 		this.miniLogPath:=logDir . "\MiniLog.json" ;Needs to be set in all cases as the minilog can be turned on whilst running
+		this.DebugLogPath:=logDir . "\DebugLog.txt"
 		this.logPath:=this.logBase . ".csv" ;The path and name for the main log specifically
 		reset:=g_SF.Memory.ReadResetsTotal()
 		if (reset!="") ;If we can read the current reset use that, otherwise set to -1 for invalid
@@ -310,7 +311,7 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 			messageString:=""
 			for _,v in this.LogEntries.Messages
 				messageString.=v . ","
-			FileAppend, % runString . "," . messageString . "`n", % this.logPath
+				FileAppend, % runString . "," . messageString . "`n", % this.logPath
 		}
 		;Reset for new
 		this.LogEntries.Messages:={}
@@ -347,6 +348,18 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 	{
 		if (this.LogEntries.HasKey("Run"))
 			this.LogEntries.Run.ActiveStart:=A_TickCount
+	}
+
+	LogDebug(value)
+	{
+		if (!g_IBM_Settings["IBM_Logger_DebugLog"])
+			return
+		logValue:=value
+		if (IsObject(logValue))
+			logValue:=AHK_JSON.Dump(logValue)
+		currentZone:=g_SF.Memory.ReadCurrentZone()
+		elapsedSeconds:=Round((A_TickCount - g_SharedData.RunStartTime) / 1000, 2)
+		FileAppend, % elapsedSeconds . "s | z" . currentZone . " | " . logValue . "`n", % this.DebugLogPath
 	}
 
 	AddMessage(message)

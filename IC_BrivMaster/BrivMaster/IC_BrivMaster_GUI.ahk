@@ -537,6 +537,8 @@
 		this.AddToolTip("IBM_Logger_MiniLog", "Select this option to output a small log (MiniLog.json) containing just details of the previous run, for use with monitoring tools etc")
 		Gui, IBM_Home:Add, CheckBox, x+15 h18 0x200 vIBM_Logger_ZoneLog gIBM_Generic_Setting_Int,Log zone progression
 		this.AddToolTip("IBM_Logger_ZoneLog", "Select this option to include zone progression details in the main log. This massively increases the log size and makes it much less human readable, so should only be turned on when debugging your setup")
+		Gui, IBM_Home:Add, CheckBox, x+15 h18 0x200 vIBM_Logger_DebugLog gIBM_Generic_Setting_Int,Debug Log
+		this.AddToolTip("IBM_Logger_DebugLog", "Select this option to write the detailed debug CSV log to disk. This should be left off unless you need the extra run log output for troubleshooting")
 		GuiControlGet, groupPos, IBM_Home:Pos,IBM_Group_Log ;Used for setting the next box
 		nextGroupStart:=groupPosY+groupPosH+1
 		;Offsets
@@ -903,6 +905,7 @@
 		;Logs
 		GuiControl, IBM_Home:, IBM_Logger_Minilog, % g_IBM_Settings.IBM_Logger_Minilog
 		GuiControl, IBM_Home:, IBM_Logger_ZoneLog, % g_IBM_Settings.IBM_Logger_ZoneLog
+		GuiControl, IBM_Home:, IBM_Logger_DebugLog, % g_IBM_Settings.IBM_Logger_DebugLog
 		;Offsets
 		GuiControl, IBM_Home:, IBM_Offsets_Check, % g_IBM_Settings.HUB.IBM_Offsets_Check
 		GuiControl, IBM_Home:, IBM_Offsets_Lock_Pointers, % g_IBM_Settings.HUB.IBM_Offsets_Lock_Pointers
