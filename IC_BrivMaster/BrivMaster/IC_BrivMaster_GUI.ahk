@@ -767,7 +767,7 @@
 		Gui, IBM_Home:Add, Text, xs+10 ys+20 h18 0x200, Casino timeout base ticks:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Casino_Timeout_Base gIBM_Generic_Setting_Int
 		this.AddToolTip("IBM_Casino_Timeout_Base", "Overrides the Ellywick Casino timeout base ticks. Increase this if the casino loop is expiring before the hand resolves.")
-		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, Toggle Auto Progress timeout ticks:
+		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, Toggle auto progress timeout ticks:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w70 x+3 Number Limit6 vIBM_ToggleAutoProgress_Timeout gIBM_Generic_Setting_Int
 		this.AddToolTip("IBM_ToggleAutoProgress_Timeout", "Maximum number of ticks to wait when toggling auto-progress. Increase this if auto progress isn't toggling consistently.")
 		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, Max online SB stack time ticks:
