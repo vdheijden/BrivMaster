@@ -309,7 +309,7 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 			messageString:=""
 			for _,v in this.LogEntries.Messages
 				messageString.=v . ","
-				FileAppend, % runString . "," . messageString . "`n", % this.logPath
+			FileAppend, % runString . "," . messageString . "`n", % this.logPath
 		}
 		;Reset for new
 		this.LogEntries.Messages:={}

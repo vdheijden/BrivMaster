@@ -774,7 +774,7 @@
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Online_Stack_Max_Time gIBM_Generic_Setting_Int
 		this.AddToolTip("IBM_Online_Stack_Max_Time", "Maximum number of ticks to wait for online Steelbones stacks. Increase this if you receive errors stating online stacking took too long.")
 		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, SB stack buffer multiplier:
-		Gui, IBM_Home:Add, Edit, +%editTextColour% w55 x+3 Number Limit5 vIBM_GetTargetStacks_Multiplier gIBM_Generic_Setting_Float
+		Gui, IBM_Home:Add, Edit, +%editTextColour% w55 x+3 Number Limit5 vIBM_GetTargetStacks_Multiplier gIBM_Generic_Setting_Float_Round2
 		this.AddToolTip("IBM_GetTargetStacks_Multiplier", "Safety buffer multiplier applied when calculating the target Steelbones stacks for the next run. Up to two decimal places.")
 
 		;++++++++++++++++++LEVELS TAB++++++++++++++++++
@@ -1453,7 +1453,7 @@ IBM_Generic_Setting_String() ;Generic g-label for non-hub settings that should b
     g_IBM_Settings[A_GuiControl]:=value . ""
 }
 
-IBM_Generic_Setting_Float() ;Generic g-label for non-hub settings that should be forced to Float and capped at 2 decimal places
+IBM_Generic_Setting_Float_Round2() ;Generic g-label for non-hub settings that should be forced to Float and capped at 2 decimal places
 {
 	if (g_IriBrivMaster_GUI.controlLock)
 		return
