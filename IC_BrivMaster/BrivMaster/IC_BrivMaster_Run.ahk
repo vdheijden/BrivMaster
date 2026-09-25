@@ -247,7 +247,6 @@ class IC_BrivMaster_GemFarm_Class
 			}
 			else ;No Thellora, so Casino in z1
 			{
-				this.RouteMaster.ToggleAutoProgress(0,false,true) ;Stop progression until Casino is complete
 				this.EllywickCasino.lockedFrontColumnChamps:=this.levelManager.SetupFirstZoneFrontRow()
 				this.levelManager.LevelFormation("M","z1",,true,,true)
 				g_SharedData.UpdateOutbound("LoopString","Ellywick's Casino - No Thellora in M")
@@ -274,7 +273,7 @@ class IC_BrivMaster_GemFarm_Class
 				this.levelManager.LevelFormation("Q","min",0) ;One tap of levelling after the change so that BBEG->Dyna swap or such happens
 				if (g_Heroes[139].inQ OR g_Heroes[139].inE)
 				{
-					this.DoRushWait(true)
+					this.DoRushWait()
 					this.RouteMaster.UpdateThellora()
 				}
 			}
