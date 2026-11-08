@@ -129,7 +129,7 @@ class IC_BrivMaster_GemFarm_Class
 				g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress(0,false,true) - Set initial autoprogess ASAP")
 				this.offRamp:=false ;TODO: There's a lot of resetting that could probably be wrapped together. Or possibly this whole block carved out
 				this.failedConversionMode:=false
-                this.levelManager.Reset()
+				this.levelManager.Reset()
                 this.RouteMaster.Reset()
 				this.EllywickCasino.Reset()
 				this.IBM_FirstZone(this.currentZone)
