@@ -773,7 +773,7 @@
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w70 x+3 Number Limit6 vIBM_ToggleAutoProgress_Timeout gIBM_Generic_Setting_Int
 		this.AddToolTip("IBM_ToggleAutoProgress_Timeout", "Maximum time in milliseconds for ToggleAutoProgress() to confirm the requested auto-progress state before continuing.")
 		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, SB stack buffer multiplier:
-		Gui, IBM_Home:Add, Edit, +%editTextColour% w55 x+3 Number Limit5 vIBM_GetTargetStacks_Multiplier gIBM_Generic_Setting_Float
+		Gui, IBM_Home:Add, Edit, +%editTextColour% w55 x+3 Limit5 vIBM_GetTargetStacks_Multiplier gIBM_Generic_Setting_Float
 		this.AddToolTip("IBM_GetTargetStacks_Multiplier", "Safety multiplier applied when calculating the target Steelbones stacks for the next run. Up to two decimal places.")
 		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, Max online stack time:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Online_Stack_Max_Time gIBM_Generic_Setting_Int
@@ -1461,9 +1461,8 @@ IBM_Generic_Setting_Float() ;Generic g-label for non-hub settings that should be
 	if (g_IriBrivMaster_GUI.controlLock)
 		return
 	GuiControlGet, value, , %A_GuiControl%
-	value:=Round(value+0, 2)
-	g_IBM_Settings[A_GuiControl]:=value
-	GuiControl, IBM_Home:, %A_GuiControl%, % value
+	if value is number
+		g_IBM_Settings[A_GuiControl]:=Round(value+0, 2)
 }
 
 IBM_Generic_Hub_Setting_Int() ;Hub version
