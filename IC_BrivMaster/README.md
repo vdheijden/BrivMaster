@@ -211,9 +211,9 @@ Output mini log: When selected details of the last run will be output to the log
 
 > Author's Note: This is intended for further automated processing, and should be off otherwise as the main CSV log contains the same information.
 
-Log zone progression: When selected a log entry will be made for each new zone reached, containing the zone and the expected progression for that zone.
+Log zone progression: When selected, each new zone is written as a row in a separate ZoneProgression.csv file. The file includes the run reset number, run start tick, elapsed time, zone, intended formation, and expected next zone.
 
-> Author's Note: This produces a vast amount of log output, and makes it difficult to follow the log manually, so it should be off when not debugging issues. It can be useful for identifiying drift.
+> Author's Note: This produces a large amount of log output, so it should be off when not debugging issues. It can be useful for identifying drift.
 
 ### Offsets
 

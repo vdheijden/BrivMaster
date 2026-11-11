@@ -266,6 +266,8 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 		this.miniLogPath:=logDir . "\MiniLog.json" ;Needs to be set in all cases as the minilog can be turned on whilst running
 		this.DebugLogPath:=logDir . "\DebugLog.txt"
 		this.logPath:=this.logBase . ".csv" ;The path and name for the main log specifically
+		this.zoneLogPath:=this.logBase . "_ZoneProgression.csv"
+		this.LastZoneLogged:=0
 		reset:=g_SF.Memory.ReadResetsTotal()
 		if (reset!="") ;If we can read the current reset use that, otherwise set to -1 for invalid
 			g_SharedData.UpdateOutbound("RunLogResetNumber",reset)
@@ -325,6 +327,7 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 		this.LogEntries.Run.LastZone:=0
 		this.LogEntries.Run.Fail:=false
 		this.LogEntries.Run.Cycle:=""
+		this.LastZoneLogged:=0
 	}
 
 	OutputHeader(strategyString)
@@ -398,8 +401,24 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 			if (zone > this.LogEntries.Run.LastZone)
 				this.LogEntries.Run.LastZone:=zone
 		}
-		if(g_IBM_Settings["IBM_Logger_ZoneLog"])
-			this.AddMessage("z" . zone . " intent: " . (g_IBM.routeMaster.ShouldWalk(zone) ? "E" : "Q") . " to z" . g_IBM.routeMaster.zones[zone].nextZone.z)
+		if (zone==this.LastZoneLogged)
+			return
+		this.LastZoneLogged:=zone
+		if (g_IBM_Settings["IBM_Logger_ZoneLog"])
+			this.LogZoneProgression(zone)
+	}
+
+	LogZoneProgression(zone)
+	{
+		if (!FileExist(this.zoneLogPath))
+			FileAppend, % "Reset #,Start Tick,Elapsed ms,Zone,Intent,Next Zone`n", % this.zoneLogPath
+		intent:=g_IBM.routeMaster.ShouldWalk(zone) ? "E" : "Q"
+		nextZone:=""
+		if (g_IBM.routeMaster.zones.HasKey(zone) AND IsObject(g_IBM.routeMaster.zones[zone].nextZone))
+			nextZone:=g_IBM.routeMaster.zones[zone].nextZone.z
+		elapsed:=A_TickCount - this.LogEntries.Run.Start
+		row:=this.LogEntries.Run.ResetNumber . "," . this.LogEntries.Run.Start . "," . elapsed . "," . zone . "," . intent . "," . nextZone . "`n"
+		FileAppend, % row, % this.zoneLogPath
 	}
 }
 
