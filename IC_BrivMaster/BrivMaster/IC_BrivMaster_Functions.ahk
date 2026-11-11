@@ -268,6 +268,7 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 		this.logPath:=this.logBase . ".csv" ;The path and name for the main log specifically
 		this.zoneLogPath:=this.logBase . "_ZoneProgression.csv"
 		this.LastZoneLogged:=0
+		this.PreviousNextZone:=""
 		reset:=g_SF.Memory.ReadResetsTotal()
 		if (reset!="") ;If we can read the current reset use that, otherwise set to -1 for invalid
 			g_SharedData.UpdateOutbound("RunLogResetNumber",reset)
@@ -328,6 +329,7 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 		this.LogEntries.Run.Fail:=false
 		this.LogEntries.Run.Cycle:=""
 		this.LastZoneLogged:=0
+		this.PreviousNextZone:=""
 	}
 
 	OutputHeader(strategyString)
@@ -411,14 +413,18 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 	LogZoneProgression(zone)
 	{
 		if (!FileExist(this.zoneLogPath))
-			FileAppend, % "Reset #,Start Tick,Elapsed ms,Zone,Intent,Next Zone`n", % this.zoneLogPath
+			FileAppend, % "Reset #,Start Tick,Elapsed ms,Zone,Intent,Next Zone,Matches Expected Zone`n", % this.zoneLogPath
 		intent:=g_IBM.routeMaster.ShouldWalk(zone) ? "E" : "Q"
 		nextZone:=""
 		if (g_IBM.routeMaster.zones.HasKey(zone) AND IsObject(g_IBM.routeMaster.zones[zone].nextZone))
 			nextZone:=g_IBM.routeMaster.zones[zone].nextZone.z
+		matchesPreviousNextZone:=""
+		if (this.PreviousNextZone!="")
+			matchesPreviousNextZone:=zone==this.PreviousNextZone ? "TRUE" : "FALSE"
 		elapsed:=A_TickCount - this.LogEntries.Run.Start
-		row:=this.LogEntries.Run.ResetNumber . "," . this.LogEntries.Run.Start . "," . elapsed . "," . zone . "," . intent . "," . nextZone . "`n"
+		row:=this.LogEntries.Run.ResetNumber . "," . this.LogEntries.Run.Start . "," . elapsed . "," . zone . "," . intent . "," . nextZone . "," . matchesPreviousNextZone . "`n"
 		FileAppend, % row, % this.zoneLogPath
+		this.PreviousNextZone:=nextZone
 	}
 }
 
