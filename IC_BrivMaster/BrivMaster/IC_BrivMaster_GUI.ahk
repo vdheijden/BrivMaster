@@ -795,8 +795,8 @@
 		Gui, IBM_Home:Add, Groupbox, Section xm+2 ym+48 w%groupWidth% h150 vIBM_Group_Advanced, Advanced
 		Gui, IBM_Home:Font, w400
 		Gui, IBM_Home:Add, Text, xs+10 ys+20 h18 0x200, Casino timeout base:
-		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Casino_Timeout_Base gIBM_Generic_Setting_Int
-		this.AddToolTip("IBM_Casino_Timeout_Base", "Overrides the Ellywick Casino timeout base used by the class-level TIMEOUT_BASE constant. Increase this if the casino loop is expiring before the hand resolves.")
+		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Timeout_Dynamic_Casino gIBM_Generic_Setting_Int
+		this.AddToolTip("IBM_Timeout_Dynamic_Casino", "Overrides the Ellywick Casino timeout base. Increase this if the casino loop is expiring before the hand resolves.")
 		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, ToggleAutoProgress wait:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w70 x+3 Number Limit6 vIBM_ToggleAutoProgress_Timeout gIBM_Generic_Setting_Int
 		this.AddToolTip("IBM_ToggleAutoProgress_Timeout", "Maximum time in milliseconds for ToggleAutoProgress() to confirm the requested auto-progress state before continuing.")
@@ -993,7 +993,7 @@
 		GuiControl, IBM_Home:, IBM_Casino_Redraws_Base, % g_IBM_Settings.IBM_Casino_Redraws_Base
 		GuiControl, IBM_Home:, IBM_Casino_MinCards_Base, % g_IBM_Settings.IBM_Casino_MinCards_Base
 		;Advanced
-		GuiControl, IBM_Home:, IBM_Casino_Timeout_Base, % g_IBM_Settings.IBM_Casino_Timeout_Base
+		GuiControl, IBM_Home:, IBM_Timeout_Dynamic_Casino, % g_IBM_Settings.IBM_Timeout_Dynamic_Casino
 		GuiControl, IBM_Home:, IBM_ToggleAutoProgress_Timeout, % g_IBM_Settings.IBM_ToggleAutoProgress_Timeout
 		GuiControl, IBM_Home:, IBM_GetTargetStacks_Multiplier, % Round(g_IBM_Settings.IBM_GetTargetStacks_Multiplier, 2)
 		GuiControl, IBM_Home:, IBM_Timeout_Dynamic_Stacking, % g_IBM_Settings.IBM_Timeout_Dynamic_Stacking

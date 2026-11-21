@@ -160,7 +160,7 @@ Class IC_IriBrivMaster_Component
 		settings.IBM_Casino_Target_Base["_DEFAULT"]:=3
 		settings.IBM_Casino_Redraws_Base["_DEFAULT"]:=1
 		settings.IBM_Casino_MinCards_Base["_DEFAULT"]:=0
-		settings.IBM_Casino_Timeout_Base["_DEFAULT"]:=100000
+		settings.IBM_Timeout_Dynamic_Casino["_DEFAULT"]:=100000
 		settings.IBM_Casino_Front_Row_Threshold["_DEFAULT"]:=2
 		settings.IBM_OffLine_Delay_Time["_DEFAULT"]:=15000
 		settings.IBM_ToggleAutoProgress_Timeout["_DEFAULT"]:=1000
