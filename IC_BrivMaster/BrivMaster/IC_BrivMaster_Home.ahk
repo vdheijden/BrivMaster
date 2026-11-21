@@ -160,8 +160,12 @@ Class IC_IriBrivMaster_Component
 		settings.IBM_Casino_Target_Base["_DEFAULT"]:=3
 		settings.IBM_Casino_Redraws_Base["_DEFAULT"]:=1
 		settings.IBM_Casino_MinCards_Base["_DEFAULT"]:=0
+		settings.IBM_Casino_Timeout_Base["_DEFAULT"]:=100000
 		settings.IBM_Casino_Front_Row_Threshold["_DEFAULT"]:=2
 		settings.IBM_OffLine_Delay_Time["_DEFAULT"]:=15000
+		settings.IBM_ToggleAutoProgress_Timeout["_DEFAULT"]:=1000
+		settings.IBM_GetTargetStacks_Multiplier["_DEFAULT"]:=1.0
+		settings.IBM_Timeout_Dynamic_Stacking["_DEFAULT"]:=200000
 		settings.IBM_OffLine_Sleep_Time["_DEFAULT"]:=0
 		settings.IBM_Level_Options_Mod_Key["_DEFAULT"]:="Shift"
 		settings.IBM_Level_Options_Mod_Value["_DEFAULT"]:=10
@@ -192,6 +196,7 @@ Class IC_IriBrivMaster_Component
 		settings.IBM_Allow_Modron_Buff_Off["_DEFAULT"]:=false ;Hidden setting - allows the script to be started without the modron core buff enabled, for those who want to use potions via saved familiars
 		settings.IBM_Logger_MiniLog["_DEFAULT"]:=false
 		settings.IBM_Logger_ZoneLog["_DEFAULT"]:=false
+		settings.IBM_Logger_DebugLog["_DEFAULT"]:=false
 		settings.IBM_Online_Farideh_Threshold["_DEFAULT"]:=90
 		settings.IBM_Online_Farideh_Condition["_DEFAULT"]:=1
 		settings.IBM_Scan_Codes["Esc","_DEFAULT"]:=1 ;Escape for skipping splash screen
@@ -277,8 +282,13 @@ Class IC_IriBrivMaster_Component
 	}
 
 	Start()
-	{
-		g_ServerCall.Update()
+    {
+		if (this.Stats.StopTime!="")
+		{
+			this.Stats.PausedTime+=A_TickCount - this.Stats.StopTime
+			this.Stats.StopTime:=""
+		}
+        g_ServerCall.Update()
 		fncToCallOnTimer:=this.TimerFunction
 		SetTimer, %fncToCallOnTimer%, 600, 0
 		this.SharedRunData:="" ;Reset this on start
@@ -292,10 +302,12 @@ Class IC_IriBrivMaster_Component
 		this.GameSettingsCheck()
 	}
 
-	Stop()
-	{
-		fncToCallOnTimer := this.TimerFunction
-		SetTimer, %fncToCallOnTimer%, Off
+    Stop()
+    {
+		if (this.Stats.StopTime=="")
+			this.Stats.StopTime:=A_TickCount
+        fncToCallOnTimer := this.TimerFunction
+        SetTimer, %fncToCallOnTimer%, Off
 		g_IriBrivMaster_GUI.ResetStatusText()
 	}
 
@@ -340,6 +352,9 @@ Class IC_IriBrivMaster_Component
 		this.Stats.FailRuns:=0
 		this.Stats.BossKills:=0
 		this.Stats.StartTime:=""
+		this.Stats.PausedTime:=0
+		this.Stats.StopTime:=""
+		this.Stats.ChestTrackingStarted:=false
 
 		this.Stats.Chests:={}
 		this.Stats.Chests.SilverStart:=""
@@ -426,23 +441,30 @@ Class IC_IriBrivMaster_Component
 					if(silvers!="")
 					{
 						this.Chests.CurrentSilver:=silvers
-						this.Stats.Chests.SilverStart:=silvers
+						if (this.Stats.Chests.SilverStart=="")
+							this.Stats.Chests.SilverStart:=silvers
 					}
 					golds:=g_SF.Memory.ReadChestCountByID(2)
 					if(golds!="")
 					{
 						this.Chests.CurrentGold:=golds
-						this.Stats.Chests.GoldStart:=golds
+						if (this.Stats.Chests.GoldStart=="")
+							this.Stats.Chests.GoldStart:=golds
 					}
-					this.Chests.PurchasedSilver:=0	;Reset here as this is the point we are measuring from
-					this.Chests.OpenedSilver:=0
-					this.Chests.PurchasedGold:=0
-					this.Chests.OpenedGold:=0
+					if (!this.Stats.ChestTrackingStarted)
+					{
+						this.Chests.PurchasedSilver:=0
+						this.Chests.OpenedSilver:=0
+						this.Chests.PurchasedGold:=0
+						this.Chests.OpenedGold:=0
+						this.Stats.ChestTrackingStarted:=true
+					}
 					gems:=g_SF.Memory.ReadGems()
 					if(gems!="")
 					{
 						this.CurrentGems:=gems
-						this.Stats.StartGems:=gems
+						if (this.Stats.StartGems=="")
+							this.Stats.StartGems:=gems
 					}
 					LogData:=AHK_JSON.Load(this.SharedRunData.RunLog)
 					this.Stats.PreviousRunEndTime:=LogData.End ;Include this so it is available for run timing
@@ -491,8 +513,9 @@ Class IC_IriBrivMaster_Component
 					if (this.Stats.StartTime=="") ;First run
 					{
 						this.Stats.StartTime:=LogData.Start
+						this.Stats.PausedTime:=0
 					}
-					totalTime:=LogData.End - this.Stats.StartTime
+					totalTime:=LogData.End - this.Stats.StartTime - this.Stats.PausedTime
 					GuiControl, IBM_Home:, IBM_Stats_Total_Runs, % this.Stats.TotalRuns . " in " . ROUND(totalTime/1000,2) . "s (" . ROUND(totalTime/3600000,2) . "h)"
 					GuiControl, IBM_Home:, IBM_Stats_Fail_Runs, % this.Stats.FailRuns . " for " . ROUND(this.Stats.FailTotalTime/1000,2) . "s"
 					silvers:=g_SF.Memory.ReadChestCountByID(1)

@@ -2,6 +2,7 @@
 
 class IC_BrivMaster_EllywickCasino_Class ;A class to manage the whole casino, without the use of a timer
 {
+	static TIMEOUT_BASE:=(IsObject(g_IBM_Settings) && g_IBM_Settings.HasKey("IBM_Casino_Timeout_Base") ? g_IBM_Settings["IBM_Casino_Timeout_Base"] : 100000)  ;Allow 10s at x10 speed, 8s at x12.5
 	static ULT_DELAY:=3750 ;Half of the 7500ms duration of Elly's ult, including run out time, per the CotFeywild .IsUltimateActive read TODO: This is for 5 cards (1000 start+750 per card+750 applying debuffs+2000 end), possibly should go halfway between 4 and 5?
 	
 	__New()
@@ -263,7 +264,11 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 			FileCreateDir, %logDir%
 		this.logBase:=logDir . "\RunLog_" . formattedDateTime ;A separate variable so other logs can use a matching start time, e.g. RunLog_20250101T000000.csv from this class and RunLog_20250101T000000_Relay.csv
 		this.miniLogPath:=logDir . "\MiniLog.json" ;Needs to be set in all cases as the minilog can be turned on whilst running
+		this.DebugLogPath:=logDir . "\DebugLog.txt"
 		this.logPath:=this.logBase . ".csv" ;The path and name for the main log specifically
+		this.zoneLogPath:=this.logBase . "_ZoneProgression.csv"
+		this.LastZoneLogged:=0
+		this.PreviousNextZone:=""
 		reset:=g_SF.Memory.ReadResetsTotal()
 		if (reset!="") ;If we can read the current reset use that, otherwise set to -1 for invalid
 			g_SharedData.UpdateOutbound("RunLogResetNumber",reset)
@@ -276,6 +281,7 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 	NewRun()
 	{
 		startTime:=A_TickCount ;So it doesn't change between entries
+		g_SharedData.RunStartTime:=startTime
 		if (this.LogEntries.HasKey("Run")) ;There will be no entry for the first run
 		{
 			this.LogEntries.Run.End:=startTime
@@ -308,7 +314,7 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 			messageString:=""
 			for _,v in this.LogEntries.Messages
 				messageString.=v . ","
-			FileAppend, % runString . "," . messageString . "`n", % this.logPath
+				FileAppend, % runString . "," . messageString . "`n", % this.logPath
 		}
 		;Reset for new
 		this.LogEntries.Messages:={}
@@ -322,6 +328,8 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 		this.LogEntries.Run.LastZone:=0
 		this.LogEntries.Run.Fail:=false
 		this.LogEntries.Run.Cycle:=""
+		this.LastZoneLogged:=0
+		this.PreviousNextZone:=""
 	}
 
 	OutputHeader(strategyString)
@@ -345,6 +353,18 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 	{
 		if (this.LogEntries.HasKey("Run"))
 			this.LogEntries.Run.ActiveStart:=A_TickCount
+	}
+
+	LogDebug(value)
+	{
+		if (!g_IBM_Settings["IBM_Logger_DebugLog"])
+			return
+		logValue:=value
+		if (IsObject(logValue))
+			logValue:=AHK_JSON.Dump(logValue)
+		currentZone:=g_SF.Memory.ReadCurrentZone()
+		elapsedSeconds:=Round((A_TickCount - g_SharedData.RunStartTime) / 1000, 2)
+		FileAppend, % elapsedSeconds . "s | z" . currentZone . " | " . logValue . "`n", % this.DebugLogPath
 	}
 
 	AddMessage(message)
@@ -383,8 +403,28 @@ class IC_BrivMaster_Logger_Class ;A class for recording run logs
 			if (zone > this.LogEntries.Run.LastZone)
 				this.LogEntries.Run.LastZone:=zone
 		}
-		if(g_IBM_Settings["IBM_Logger_ZoneLog"])
-			this.AddMessage("z" . zone . " intent: " . (g_IBM.routeMaster.ShouldWalk(zone) ? "E" : "Q") . " to z" . g_IBM.routeMaster.zones[zone].nextZone.z)
+		if (zone==this.LastZoneLogged)
+			return
+		this.LastZoneLogged:=zone
+		if (g_IBM_Settings["IBM_Logger_ZoneLog"])
+			this.LogZoneProgression(zone)
+	}
+
+	LogZoneProgression(zone)
+	{
+		if (!FileExist(this.zoneLogPath))
+			FileAppend, % "Reset #,Start Tick,Elapsed ms,Zone,Intent,Next Zone,Matches Expected Zone`n", % this.zoneLogPath
+		intent:=g_IBM.routeMaster.ShouldWalk(zone) ? "E" : "Q"
+		nextZone:=""
+		if (g_IBM.routeMaster.zones.HasKey(zone) AND IsObject(g_IBM.routeMaster.zones[zone].nextZone))
+			nextZone:=g_IBM.routeMaster.zones[zone].nextZone.z
+		matchesPreviousNextZone:=""
+		if (this.PreviousNextZone!="")
+			matchesPreviousNextZone:=zone==this.PreviousNextZone ? "TRUE" : "FALSE"
+		elapsed:=A_TickCount - this.LogEntries.Run.Start
+		row:=this.LogEntries.Run.ResetNumber . "," . this.LogEntries.Run.Start . "," . elapsed . "," . zone . "," . intent . "," . nextZone . "," . matchesPreviousNextZone . "`n"
+		FileAppend, % row, % this.zoneLogPath
+		this.PreviousNextZone:=nextZone
 	}
 }
 

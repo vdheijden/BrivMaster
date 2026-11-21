@@ -63,7 +63,7 @@
 		;Tab control
 		g_TabControlStartHeight:=buttonWidth+7
 		Gui, IBM_Home:Add, Tab3, x5 y%g_TabControlStartHeight% w%g_TabControlWidth% h%g_TabControlHeight% vModronTabControl, %g_TabList%
-		this.AddTab("Home|Game|Route|Levels")
+		this.AddTab("Home|Game|Route|Levels|Advanced")
 		this.Theme.UseThemeTitleBar("IBM_Home")
 		Gui, IBM_Home:Show, %  "x" . g_IBM_Settings.HUB.IBM_HOME_X . " y" . g_IBM_Settings.HUB.IBM_HOME_Y . " w" . g_TabControlWidth+10 . " h" . g_TabControlHeight+g_TabControlStartHeight+6  . " NA", % "Briv Master Home (Loading...)"
 
@@ -554,7 +554,9 @@
 		Gui, IBM_Home:Add, CheckBox, xs+10 ys+20 h18 0x200 vIBM_Logger_MiniLog gIBM_Generic_Setting_Int, Output mini log
 		this.AddToolTip("IBM_Logger_MiniLog", "Select this option to output a small log (MiniLog.json) containing just details of the previous run, for use with monitoring tools etc")
 		Gui, IBM_Home:Add, CheckBox, x+15 h18 0x200 vIBM_Logger_ZoneLog gIBM_Generic_Setting_Int,Log zone progression
-		this.AddToolTip("IBM_Logger_ZoneLog", "Select this option to include zone progression details in the main log. This massively increases the log size and makes it much less human readable, so should only be turned on when debugging your setup")
+		this.AddToolTip("IBM_Logger_ZoneLog", "Select this option to write zone progression details to a separate ZoneProgression.csv file with one row per zone, including whether each landing matched the previous expected zone. The file can grow quickly, so enable only when debugging")
+		Gui, IBM_Home:Add, CheckBox, x+15 h18 0x200 vIBM_Logger_DebugLog gIBM_Generic_Setting_Int,Debug Log
+		this.AddToolTip("IBM_Logger_DebugLog", "Select this option to write the detailed debug CSV log to disk. This should be left off unless you need the extra run log output for troubleshooting")
 		GuiControlGet, groupPos, IBM_Home:Pos,IBM_Group_Log ;Used for setting the next box
 		nextGroupStart:=groupPosY+groupPosH+1
 		;Offsets
@@ -785,6 +787,26 @@
 		Gui, IBM_Home:Add, Text, x+10 h18 0x200, Minimum cards:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w15 x+3 Number Limit1 vIBM_Casino_MinCards_Base gIBM_Generic_Setting_Int
 
+    	;++++++++++++++++++++++++++++++++++++++++++++++++
+		;++++++++++++++++++ADVANCED TAB++++++++++++++++++
+   		;++++++++++++++++++++++++++++++++++++++++++++++++
+		Gui, IBM_Home:Tab, Advanced
+		Gui, IBM_Home:Font, w700
+		Gui, IBM_Home:Add, Groupbox, Section xm+2 ym+48 w%groupWidth% h150 vIBM_Group_Advanced, Advanced
+		Gui, IBM_Home:Font, w400
+		Gui, IBM_Home:Add, Text, xs+10 ys+20 h18 0x200, Casino timeout base:
+		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Casino_Timeout_Base gIBM_Generic_Setting_Int
+		this.AddToolTip("IBM_Casino_Timeout_Base", "Overrides the Ellywick Casino timeout base used by the class-level TIMEOUT_BASE constant. Increase this if the casino loop is expiring before the hand resolves.")
+		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, ToggleAutoProgress wait:
+		Gui, IBM_Home:Add, Edit, +%editTextColour% w70 x+3 Number Limit6 vIBM_ToggleAutoProgress_Timeout gIBM_Generic_Setting_Int
+		this.AddToolTip("IBM_ToggleAutoProgress_Timeout", "Maximum time in milliseconds for ToggleAutoProgress() to confirm the requested auto-progress state before continuing.")
+		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, SB stack buffer multiplier:
+		Gui, IBM_Home:Add, Edit, +%editTextColour% w55 x+3 Limit5 vIBM_GetTargetStacks_Multiplier gIBM_Generic_Setting_Float
+		this.AddToolTip("IBM_GetTargetStacks_Multiplier", "Safety multiplier applied when calculating the target Steelbones stacks for the next run. Up to two decimal places.")
+		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, Max online stack time:
+		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Timeout_Dynamic_Stacking gIBM_Generic_Setting_Int
+		this.AddToolTip("IBM_Timeout_Dynamic_Stacking", "Maximum online stack time before the run is restarted. This value is used in the same base unit as the runtime maxOnlineStackTime calculation.")
+
 		;++++++++++++++++++++++++++++++++++++++++++++
 		;+++++++++++++++++LEVELS TAB+++++++++++++++++
 		;++++++++++++++++++++++++++++++++++++++++++++
@@ -929,6 +951,7 @@
 		;Logs
 		GuiControl, IBM_Home:, IBM_Logger_Minilog, % g_IBM_Settings.IBM_Logger_Minilog
 		GuiControl, IBM_Home:, IBM_Logger_ZoneLog, % g_IBM_Settings.IBM_Logger_ZoneLog
+		GuiControl, IBM_Home:, IBM_Logger_DebugLog, % g_IBM_Settings.IBM_Logger_DebugLog
 		;Offsets
 		GuiControl, IBM_Home:, IBM_Offsets_Check, % g_IBM_Settings.HUB.IBM_Offsets_Check
 		GuiControl, IBM_Home:, IBM_Offsets_Lock_Pointers, % g_IBM_Settings.HUB.IBM_Offsets_Lock_Pointers
@@ -969,6 +992,11 @@
 		GuiControl, IBM_Home:, IBM_Casino_Target_Base, % g_IBM_Settings.IBM_Casino_Target_Base
 		GuiControl, IBM_Home:, IBM_Casino_Redraws_Base, % g_IBM_Settings.IBM_Casino_Redraws_Base
 		GuiControl, IBM_Home:, IBM_Casino_MinCards_Base, % g_IBM_Settings.IBM_Casino_MinCards_Base
+		;Advanced
+		GuiControl, IBM_Home:, IBM_Casino_Timeout_Base, % g_IBM_Settings.IBM_Casino_Timeout_Base
+		GuiControl, IBM_Home:, IBM_ToggleAutoProgress_Timeout, % g_IBM_Settings.IBM_ToggleAutoProgress_Timeout
+		GuiControl, IBM_Home:, IBM_GetTargetStacks_Multiplier, % Round(g_IBM_Settings.IBM_GetTargetStacks_Multiplier, 2)
+		GuiControl, IBM_Home:, IBM_Timeout_Dynamic_Stacking, % g_IBM_Settings.IBM_Timeout_Dynamic_Stacking
 
 		;BM LEVELS TAB
 
@@ -1458,6 +1486,15 @@ IBM_Generic_Setting_String() ;Generic g-label for non-hub settings that should b
 		return
 	GuiControlGet, value, , %A_GuiControl%
 	g_IBM_Settings[A_GuiControl]:=value . ""
+}
+
+IBM_Generic_Setting_Float() ;Generic g-label for non-hub settings that should be forced to Float and capped at 2 decimal places
+{
+	if (g_IriBrivMaster_GUI.controlLock)
+		return
+	GuiControlGet, value, , %A_GuiControl%
+	if value is number
+		g_IBM_Settings[A_GuiControl]:=Round(value+0, 2)
 }
 
 IBM_Generic_Hub_Setting_Int() ;Hub version

@@ -120,7 +120,9 @@ class IC_BrivMaster_GemFarm_Class
 				}
 				this.Logger.NewRun()
 				this.currentZone:=this.WaitForZoneLoad(this.currentZone)
-				this.RouteMaster.ToggleAutoProgress(g_Heroes[139].inM ? 1 : 0) ;Set initial autoprogess ASAP
+				;this.RouteMaster.ToggleAutoProgress(g_Heroes[139].inM ? 1 : 0) ;Set initial autoprogess ASAP
+				this.RouteMaster.ToggleAutoProgress(0,false,true)
+				g_SharedData.UpdateOutbound("LoopString","ToggleAutoProgress(0,false,true) - Set initial autoprogess ASAP")
 				this.offRamp:=false ;TODO: There's a lot of resetting that could probably be wrapped together. Or possibly this whole block carved out
 				this.failedConversionMode:=false
 				this.levelManager.Reset()
@@ -204,6 +206,9 @@ class IC_BrivMaster_GemFarm_Class
 	{
 		if (currentZone==1)
 		{
+			g_SharedData.UpdateOutbound("LoopString","z1 started")
+			this.RouteMaster.ToggleAutoProgress(0,false,true)
+			g_SharedData.UpdateOutbound("HasteStacks", g_Heroes[58].ReadHasteStacks())
 			if (g_IBM_Settings["IBM_Level_Diana_Cheese"] AND g_SF.InDianaCheeseWindow()) ;Diana can give excess chests after the daily reset, as it seems things don't get synced up until a restart. Level her to 200 only in that window
 				this.levelManager.OverrideLevelByIDRaiseToMin(148,"min",200)
 			if (g_Heroes[139].inM) ;Thellora in M, either combining or non-combining followed by Casino, which proceed in the same way but with Briv's z1c set when not combining
@@ -218,8 +223,9 @@ class IC_BrivMaster_GemFarm_Class
 				this.levelManager.LevelFormation("M","min") ;Level M to minimum
 				this.RouteMaster.UpdateThellora()
 				this.levelManager.LevelClickDamage() ;Probably done whilst waiting for Thellora, but not guaranteed
-				g_SharedData.UpdateOutbound("LoopString","Ellywick's Casino")
+				g_SharedData.UpdateOutbound("LoopString","Ellywick's Casino - Thellora")
 				unlockRequired:=this.EllywickCasino.Casino()
+				g_SharedData.UpdateOutbound("LoopString","Casino Done - Thellora")
 				if (this.RouteMaster.IsFeatSwap()) ;Swap formation here as we can't be blocked in the transition
 				{
 					this.RouteMaster.StartAutoProgressSoft() ;Start moving ASAP
@@ -245,10 +251,12 @@ class IC_BrivMaster_GemFarm_Class
 				this.RouteMaster.ToggleAutoProgress(0,false,true) ;Force stop
 				this.EllywickCasino.lockedFrontColumnChamps:=this.levelManager.SetupFirstZoneFrontRow()
 				this.levelManager.LevelFormation("M","z1",,true,,true)
-				g_SharedData.UpdateOutbound("LoopString","Ellywick's Casino")
+				g_SharedData.UpdateOutbound("LoopString","Ellywick's Casino - No Thellora")
 				this.levelManager.LevelClickDamage()
 				if(this.EllywickCasino.Casino()) ;Moved this out of the IBM_EllywickCasino end logic, for non-combine unlock right away as if the zone is somehow not complete Briv won't be present to get 'free' stacks anyway | TODO: Think about ghost levelling in this case
 					this.EllywickCasino.UnlockHeroes()
+				g_SharedData.UpdateOutbound("LoopString","Casino Done - No Thellora")
+				this.RouteMaster.ToggleAutoProgress(0, false, true)
 				quest:=g_SF.Memory.ReadQuestRemaining() ;Wait for zone completion so we can level Briv - TODO: this should perhaps have a timeout in case things get weird (no familiars in modron formation? Which would mean no gold anyway)
 				while(quest>0)
 				{
@@ -268,7 +276,7 @@ class IC_BrivMaster_GemFarm_Class
 				this.levelManager.LevelFormation("Q","min",0) ;One tap of levelling after the change so that BBEG->Dyna swap or such happens
 				if (g_Heroes[139].inQ OR g_Heroes[139].inE)
 				{
-					this.DoRushWait()
+					this.DoRushWait(true)
 					this.RouteMaster.UpdateThellora()
 				}
 			}

@@ -100,6 +100,10 @@ class IC_BrivMaster_SharedData_Class ;In the shared file as the SettingsPath sta
 		this.RunLog:=""
 		this.LoopString:=""
 		this.LastCloseReason:=""
+		this.RunStartTime:=A_TickCount
+		this.DebugLogPath:=A_LineFile . "\..\..\Logs\DebugLog.txt"
+		if (!FileExist(A_LineFile . "\..\..\Logs"))
+			FileCreateDir, % A_LineFile . "\..\..\Logs"
 	}
 
 	Close() ;Taken from what was IC_BrivGemFarmRun_SharedData_Class in IC_BrivGemFarm_Run.ahk
@@ -137,12 +141,14 @@ class IC_BrivMaster_SharedData_Class ;In the shared file as the SettingsPath sta
 		g_IBM.RefreshGemFarmWindow()
     }
 
-	UpdateOutbound(key,value) ;Update if the value has changed at mark the outbound data as dirty
+	UpdateOutbound(key,value) ;Update if the value has changed and mark the outbound data as dirty
 	{
 		if (this[key]!=value)
 		{
 			this[key]:=value
 			this.IBM_OutboundDirty:=true
+			if (IsObject(g_IBM) && IsObject(g_IBM.Logger))
+				g_IBM.Logger.LogDebug(key . " = " . value)
 		}
 	}
 
