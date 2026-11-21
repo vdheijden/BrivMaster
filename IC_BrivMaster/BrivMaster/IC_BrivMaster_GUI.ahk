@@ -804,8 +804,8 @@
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w55 x+3 Limit5 vIBM_GetTargetStacks_Multiplier gIBM_Generic_Setting_Float
 		this.AddToolTip("IBM_GetTargetStacks_Multiplier", "Safety multiplier applied when calculating the target Steelbones stacks for the next run. Up to two decimal places.")
 		Gui, IBM_Home:Add, Text, xs+10 y+10 h18 0x200, Max online stack time:
-		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Online_Stack_Max_Time gIBM_Generic_Setting_Int
-		this.AddToolTip("IBM_Online_Stack_Max_Time", "Maximum online stack time before the run is restarted. This value is used in the same base unit as the runtime maxOnlineStackTime calculation.")
+		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Timeout_Dynamic_Stacking gIBM_Generic_Setting_Int
+		this.AddToolTip("IBM_Timeout_Dynamic_Stacking", "Maximum online stack time before the run is restarted. This value is used in the same base unit as the runtime maxOnlineStackTime calculation.")
 
 		;++++++++++++++++++++++++++++++++++++++++++++
 		;+++++++++++++++++LEVELS TAB+++++++++++++++++
@@ -996,7 +996,7 @@
 		GuiControl, IBM_Home:, IBM_Casino_Timeout_Base, % g_IBM_Settings.IBM_Casino_Timeout_Base
 		GuiControl, IBM_Home:, IBM_ToggleAutoProgress_Timeout, % g_IBM_Settings.IBM_ToggleAutoProgress_Timeout
 		GuiControl, IBM_Home:, IBM_GetTargetStacks_Multiplier, % Round(g_IBM_Settings.IBM_GetTargetStacks_Multiplier, 2)
-		GuiControl, IBM_Home:, IBM_Online_Stack_Max_Time, % g_IBM_Settings.IBM_Online_Stack_Max_Time
+		GuiControl, IBM_Home:, IBM_Timeout_Dynamic_Stacking, % g_IBM_Settings.IBM_Timeout_Dynamic_Stacking
 
 		;BM LEVELS TAB
 
