@@ -275,6 +275,11 @@ Class IC_IriBrivMaster_Component
 
 	Start()
     {
+		if (this.Stats.StopTime!="")
+		{
+			this.Stats.PausedTime+=A_TickCount - this.Stats.StopTime
+			this.Stats.StopTime:=""
+		}
         g_ServerCall.Update()
 		fncToCallOnTimer:=this.TimerFunction
         SetTimer, %fncToCallOnTimer%, 600, 0
@@ -291,6 +296,8 @@ Class IC_IriBrivMaster_Component
 
     Stop()
     {
+		if (this.Stats.StopTime=="")
+			this.Stats.StopTime:=A_TickCount
         fncToCallOnTimer := this.TimerFunction
         SetTimer, %fncToCallOnTimer%, Off
 		g_IriBrivMaster_GUI.ResetStatusText()
@@ -337,6 +344,9 @@ Class IC_IriBrivMaster_Component
 		this.Stats.FailRuns:=0
 		this.Stats.BossKills:=0
 		this.Stats.StartTime:=""
+		this.Stats.PausedTime:=0
+		this.Stats.StopTime:=""
+		this.Stats.ChestTrackingStarted:=false
 
 		this.Stats.Chests:={}
 		this.Stats.Chests.SilverStart:=""
@@ -423,23 +433,30 @@ Class IC_IriBrivMaster_Component
 					if(silvers!="")
 					{
 						this.Chests.CurrentSilver:=silvers
-						this.Stats.Chests.SilverStart:=silvers
+						if (this.Stats.Chests.SilverStart=="")
+							this.Stats.Chests.SilverStart:=silvers
 					}
 					golds:=g_SF.Memory.ReadChestCountByID(2)
 					if(golds!="")
 					{
 						this.Chests.CurrentGold:=golds
-						this.Stats.Chests.GoldStart:=golds
+						if (this.Stats.Chests.GoldStart=="")
+							this.Stats.Chests.GoldStart:=golds
 					}
-					this.Chests.PurchasedSilver:=0	;Reset here as this is the point we are measuring from
-					this.Chests.OpenedSilver:=0
-					this.Chests.PurchasedGold:=0
-					this.Chests.OpenedGold:=0
+					if (!this.Stats.ChestTrackingStarted)
+					{
+						this.Chests.PurchasedSilver:=0
+						this.Chests.OpenedSilver:=0
+						this.Chests.PurchasedGold:=0
+						this.Chests.OpenedGold:=0
+						this.Stats.ChestTrackingStarted:=true
+					}
 					gems:=g_SF.Memory.ReadGems()
 					if(gems!="")
 					{
 						this.CurrentGems:=gems
-						this.Stats.StartGems:=gems
+						if (this.Stats.StartGems=="")
+							this.Stats.StartGems:=gems
 					}
 					LogData:=AHK_JSON.Load(this.SharedRunData.RunLog)
 					this.Stats.PreviousRunEndTime:=LogData.End ;Include this so it is available for run timing
@@ -488,8 +505,9 @@ Class IC_IriBrivMaster_Component
 					if (this.Stats.StartTime=="") ;First run
 					{
 						this.Stats.StartTime:=LogData.Start
+						this.Stats.PausedTime:=0
 					}
-					totalTime:=LogData.End - this.Stats.StartTime
+					totalTime:=LogData.End - this.Stats.StartTime - this.Stats.PausedTime
 					GuiControl, IBM_Home:, IBM_Stats_Total_Runs, % this.Stats.TotalRuns . " in " . ROUND(totalTime/1000,2) . "s (" . ROUND(totalTime/3600000,2) . "h)"
 					GuiControl, IBM_Home:, IBM_Stats_Fail_Runs, % this.Stats.FailRuns . " for " . ROUND(this.Stats.FailTotalTime/1000,2) . "s"
 					silvers:=g_SF.Memory.ReadChestCountByID(1)
