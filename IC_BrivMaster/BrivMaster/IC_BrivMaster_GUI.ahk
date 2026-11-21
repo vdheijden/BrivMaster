@@ -787,9 +787,9 @@
 		Gui, IBM_Home:Add, Text, x+10 h18 0x200, Minimum cards:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w15 x+3 Number Limit1 vIBM_Casino_MinCards_Base gIBM_Generic_Setting_Int
 
-    ;++++++++++++++++++++++++++++++++++++++++++++++++
+    	;++++++++++++++++++++++++++++++++++++++++++++++++
 		;++++++++++++++++++ADVANCED TAB++++++++++++++++++
-    ;++++++++++++++++++++++++++++++++++++++++++++++++
+   		;++++++++++++++++++++++++++++++++++++++++++++++++
 		Gui, IBM_Home:Tab, Advanced
 		Gui, IBM_Home:Font, w700
 		Gui, IBM_Home:Add, Groupbox, Section xm+2 ym+48 w%groupWidth% h150 vIBM_Group_Advanced, Advanced
