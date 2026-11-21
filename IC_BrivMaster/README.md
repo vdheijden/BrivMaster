@@ -166,10 +166,14 @@ Location: The game install location. This must include the trailing \, e.g. C:\I
 Launch Command: The command used to launch the game. For non-EGS setups this will just be the Executable and Location fields combined, however for EGS it will either be the EGS URI for the game, or if using an alternative to the EGS Launcher the appropriate command will need to be added here.
 
 > Author's Note: For the CNE client, your account details will be in this field, so do not share unredacted screenshots of it.
+
+Platform: The game platform you are playing on. Used primarily so that that Offsets can be checked whilst the game is not running (see the Offsets section below).
 	
-Hide launcher: Selecting this option will hide the window created by invoking the Launch Command. Use this only for 3rd party EGS launchers that might otherwise pop up a command window. Using it with the game directly will cause it to fail to start.
-	
-EGS & Copy from IC: Described in the introduction to this group.
+Hide launcher: Selecting these options will hide the window created by invoking the Launch Command. Use this only for 3rd party EGS launchers that might otherwise pop up a command window. Using it with the game directly will cause it to fail to start.
+- Manual start: Applies when launching the game via the game icon in Briv Master home
+- Whilst farming: Applies when Briv Master launches the game whilst running the gem Farm
+
+> Author's Note: These are separate as having the launcher pop up on manual launch might provide useful insight on things like login issues, and does not provide feedback if the launcher portion of start-up is taking a long time.
 
 ### Window Options  
 These options control the appearance of the farm script window.
@@ -285,6 +289,10 @@ The Briv jump value for each formation. The formations are described in more det
 1. Q will be Briv's standard jump (e.g. 9 for, well, 9J, 12 for 12/11J)
 2. E will be 0 for non-feat swap, or the lower jump for feat swap (e.g. 11 for 12/11J)
 3. M will reflect the jump Briv will have in the Modron formation
+
+Adventure and Patron: The ID of the adventure (strictly the objective ID) and patron to be used for farming. Checked on start-up to flag if the wrong adventure or patron has been selected. As ID codes, these are not intended to be entered manually. Double-click the control to update from the game.
+
+> Author's Note: As with any setting, these values can be edited directly in the IC_BrivMaster_Settings.json should the need arise.
 	
 ### Stacking Zones  
 Offline: Offline stacking or blank restarts will be performed on or after this zone during normal operation. If offline stacking, set this based on the stacks needed.
@@ -311,10 +319,6 @@ Platform Login: When a stacking restart is needed BrivMaster will restart the ga
 	
 Restart sleep: The amount of time to wait between the game closing and be restarted when going offline, whether stacking or not. This should generally be left at 0, but some platforms can have issues detecting the game's state if it is instantly restarted, and a small delay can help; suggest increasing in 50ms steps.
 
-Timeout factor: Controls the time allowed for the game to start and close. The start time is 10s times this value, and the close value a number of seconds equal to it. For starting the game if it fails to open in time is is closed and then restarted (which, if not allowed enough time on a slow PC, can result in it being stuck in an infinte loop), and for closing once the time expires more aggressive commands are used to force the game close, which will interrupt a save if done too early.
-	
-> Author's Note: A fast PC should use the default of 5. A very slow mobile device might benefit from values at high as 10.
-	
 Offline every x runs: This is the frequency of offline runs. A value of 1 disables hybrid stacking and will restart every run if stacks are required, a higher value means to restart every x runs.
 	
 > Author's Note: The optimal value will depend upon the user's system and platform, as memory bloat can be impacted by things like platform and drivers, and also by the type of offline being done, as it is based on the opportunity cost of doing an offline stack; therefore a relay blank restart has less impact than offline stacking for doubles, which in term has less imapct than offline stacking for singles. The ideal value is likely between 40 and 80. This setting is often referred to as FORT (Force Offline Run Threshold), taken from the BrivGemFarm setting with the same purpose.
@@ -353,22 +357,18 @@ Max sequential keys: The maximum number of levelling commands that will be send 
 Modifier key for x10/25: Modifier key levelling allows for champions to be levelled to amounts that are not multiples of 100, but applying either CTRL or SHIFT. These options set the modifer to use and the level up amount that it is bound to. This must match the the in-game key bindings; the Game Settings options can help maintain that. It is recommended to use the default of CTRL for x25.
 	
 > Author's Note: Only one value can be used at once (i.e. you can have x100 and x25, or x100 and x10, not x100, x25 and x10. This is as currently there is no particular need for it the capability to do so.
-	
-Briv Level Boost: When online stacking this option will dynamically level Briv based on the stacking zone; the intent of this feature is to allow Briv to be set to level 200 (the first multiple of 100 after he gets his farming-relevant Metalborn upgrade) to minimise the amount of levelling performed, but to also allow him to survive when stacking on higher zones.
-	
-Safety Factor: When using Briv Level Boost, this is how many more times expected incoming damage from a full zone of 100 enemies he should have in health. This value depends on how long stacking takes, as mobs will gain more enrage stacks the longer it takes. For a faster stack (up to 5s) the default of 8 is appropriate. Slower stacks may require more to be reliable.
-	
-Dynamic Diana: Diana can give excess chests after the daily reset. This option will raise her level to 200 for Electrum Chest Scavenger from 3 minutes before the daily reset to 30 minutes after. Her level in the main options should be left at 100.
+
+Suppress Front Column: If selected champions other than Briv will not be levelled if in the front row of the M formation at the start of the run. This is useful to ensure any attacks made against the formation whilst the Casino runs are directed at Briv, and thus grant Steelbones stacks. Do not use if the other champion in the front row is needed for some reason. The champion will be levelled opportunistically when the formation is under attack so that they are not placed.
+
+Ghost Level: During the Casino, level champions that are not part of the formation so long as they will not be placed, either due to all slots being full or the formation being under attack by melee monsters. This option makes it more likely all speed effects will be ready for the first normal zone. Only applied when Thellora in is in the M formation, and should normally be enabled.
+
+Dynamic Diana: Diana can give excess chests after the daily reset. This option will raise her level to 200 for Electrum Chest Scavenger from 3 minutes before the daily reset to 30 minutes after (18:59 to 19:30 UTC). During this window the buying and opening of chests will also be paused. Her level in the main options should be left at 100.
 	
 > Author's Note: This is attempting to profit from a bug, but perhaps if enough people do so it might get fixed...
-	
+
 Recovery Levelling: With this option selected, if Briv does not have enough stacks to jump but the minimum stack zone has yet to be reached, champions will be levelled to their last update when they first reach a boss zone. This can aid killing armoured bosses, but will raise the minimum zone required to gain online stacks.
 
 > Author's Note: This was a feature carried over from BrivGemFarmLevelUp, and previously always on, but since it's often undesiable it has been made an option. It will be considered for future removal. Generally if you can clear the armoured bosses prior to the minimum stack zone with standard levels this only hurts you.
-
-Suppress Front Row: If selected champions other than Briv will not be levelled if in the front row of the M formation at the start of the run. This is useful to ensure any attacks made against the formation whilst the Casino runs are directed at Briv, and thus grant Steelbones stacks. Do not use if the other champion in the front row is needed for some reason. The champion will be levelled opportunistically when the formation is under attack so that they are not placed.
-
-Ghost Level: During the Casino, level champions that are not part of the formation so long as they will not be placed, either due to all slots being full or the formation being under attack by melee monsters. This option makes it more likely all speed effects will be ready for the first normal zone. Only applied when Thellora in is in the M formation, and should normally be enabled.
 	
 ### Level Manager  
 This section allows the levelling of champions to be configured. The formations should already be set up in game before reviewing it.
@@ -417,13 +417,28 @@ The following provide the Author's current setup, which is an end-game farm usin
 > Author's Note: When saving Briv Master's settings, level settings will be ignored if no champions are displayed at all. Take care if tweaking options whilst doing something else in-game, as it is a little bit too easy to overwrite your settings. Once you have things configured to your satisfaction making a backup of IC_BrivMaster_Settings.json might be sensible.
 
 ## Hidden Settings
-Occasionally a setting may be added to Briv Master but not exposed via the GUI, most likely because it was a request with no opportunity cost, but not something that I necessarily agree with. Changing these settings requires editing the IC_BrivMaster_Settings.json file directly.
+Some settings are not exposed via the GUI, either because they are not meant to be changed in most cases, or because it was a request with no opportunity cost, but not something that I necessarily agree with. Changing these settings requires editing the IC_BrivMaster_Settings.json file directly
 - IBM_Allow_Modron_Buff_Off: Normally Briv Master will not start unless all three Modron core functions are enabled. Changing this from 0 to 1 allows the script to start with the Buffs portion disabled. This was added to allow potions to be used by familiars saved in the M formation instead. The user in question didn't want to have to change the options between different activities.
 - IBM_Format_Date_Display: AutoHotKey date format string (per https://www.autohotkey.com/docs/v1/lib/FormatTime.htm) to be used for date and time display.
 - IBM_Format_Date_File: As above, but must only use characters valid in file names. This notably means the colon is not permitted.
 - IBM_Offsets_URL: The GitHub URL to check for Offsets. Change this if you do not wish to use my repository.
 - IBM_Scan_Codes: This is a mapping of keys to the scan codes that a keyboard sends when you press them. The defaults will be appropriate for QWERTY keyboards, but other layouts might require changes. Click damage, which is ` on QWERTY keyboards, is most likely to need changes.
 - IBM_Casino_Front_Row_Threshold: Front row and ghost levelling in the Casino are allowed when the number of attacking monsters is greater than or equal to this value. Increasing it means that those will not trigger until something spawns multiple enemies at once, either Tatyana or Melf with his spawn-more effect active. This will mean that in faster (no re-roll) Casinos the front row or ghost levelling will not trigger, and the levelling will have to be done afterwards which may slow down the run. This was added for testing and is likely to be removed.
+The following timeouts are dynamic and are adjusted based on game speed, e.g. IBM_Timeout_Dynamic_Stacking defaults to 200000ms, which is 200s at x1, 20s at x10 and 16s at x12.5.
+- IBM_Timeout_Dynamic_Casino: Casino timeout in milliseconds at x1 game speed
+- IBM_Timeout_Dynamic_Stacking: Online stacking timeout in milliseconds at x1 game speed
+The following timeouts are static and do not change with game speed. Some previously used the legacy 'Timeout factor' setting and have defaults that match the default value of '5' for that.
+- IBM_Timeout_Static_Reset: Modron reset timeout in milliseconds
+- IBM_Timeout_Static_Launch: Timeout used when launching the game in milliseconds:
+	- The value entered is the timeout for one attempt to start the game
+	- 150% of this value is used as the overall timeout for starting the game
+	- 80% of this value is used for the timeout for opening the game process and aquiring the process ID
+	- 30% of this value is used for the timeout for aquiring the process ID
+- IBM_Timeout_Static_Close: Timeout used when closing the game
+- IBM_Timeout_Static_Stuck: Timeout used when detecting the game is stuck
+	- The value entered is the timeout before the game is restarted
+	- 50% of this value is used as the point that the script begins to toggle autoprogress
+	- 75% of this value is used as the point that the script attempts to fall back
 
 I hope that this project is useful to you, either directly or through ideas that have shared with BrivGemFarm and its addons (largely by Emmote).
 

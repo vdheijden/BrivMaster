@@ -12,105 +12,106 @@ Class IC_IriBrivMaster_Component
 	ServerCallFailCount:=0 ;Track the number of failed calls, so we can refresh the user data / servercall, but avoid doing so because one call happened to fail (e.g. at 20:00 UK the new game day starting tends to result in fails)
 	MemoryReadFailCount:=0 ;Separate tracker for memory reads, as these are expected to fail during resets etc (TODO: We could combine and just add different numbers, e.g. 5 for a call fail or 1 for a memory read fail?)
 
-	;START STUFF COPIED FROM IC_BrivGemFarm_Component.ahk
+	;START STUFF COPIED FROM IC_BrivGemFarm_Component.ahk TODO: Tidy this up
 
 	Run_Clicked()
-    {
-        try
-        {
-            this.Connect_Clicked()
-            SharedData:=ComObjActive(this.GemFarmGUID)
-            SharedData.ShowGui()
-        }
-        catch
-        {
-            g_SF.Hwnd:=WinExist("ahk_exe " . g_IBM_Settings["ExeName"])
-            g_SF.Memory.OpenProcessReader()
+	{
+		try
+		{
+			this.Connect_Clicked()
+			SharedData:=ComObjActive(this.GemFarmGUID)
+			SharedData.ShowGui()
+		}
+		catch
+		{
+			g_SF.Hwnd:=WinExist("ahk_exe " . g_IBM_Settings["ExeName"])
+			g_SF.Memory.OpenProcessReader()
 			g_ServerCall.Update()
-            scriptLocation:=A_LineFile . "\..\IC_BrivMaster_Run.ahk"
-            GuiControl, IBM_Home:Choose, ModronTabControl, Stats
-            for k,v in g_IriBrivMaster_StartFunctions
-            {
-                v.Call()
-            }
-            GuidCreate:=ComObjCreate("Scriptlet.TypeLib")
-            this.GemFarmGUID:= guid:=GuidCreate.Guid
-            Run, %A_AhkPath% "%scriptLocation%" "%guid%"
-        }
-    }
+			scriptLocation:=A_LineFile . "\..\IC_BrivMaster_Run.ahk"
+			GuiControl, IBM_Home:Choose, ModronTabControl, Stats
+			for k,v in g_IriBrivMaster_StartFunctions
+			{
+				v.Call()
+			}
+			GuidCreate:=ComObjCreate("Scriptlet.TypeLib")
+			this.GemFarmGUID:= guid:=GuidCreate.Guid
+			Run, %A_AhkPath% "%scriptLocation%" "%guid%"
+		}
+	}
 
-    UpdateGUIDFromLast()
-    {
-        this.GemFarmGUID:=g_SF.LoadObjectFromAHKJSON(A_LineFile . "\..\LastGUID_IBM_GemFarm.json")
-    }
+	UpdateGUIDFromLast()
+	{
+		this.GemFarmGUID:=g_SF.LoadObjectFromAHKJSON(A_LineFile . "\..\LastGUID_IBM_GemFarm.json")
+	}
 
-    Stop_Clicked()
-    {
-        for k,v in g_IriBrivMaster_StopFunctions
-        {
-            this.LEGACY_UpdateStatus("Stopping Addon Function: " . v)
-            v.Call()
-        }
-        this.LEGACY_UpdateStatus("Closing Gem Farm")
-        try
-        {
-            SharedRunData:=ComObjActive(this.GemFarmGUID)
-            SharedRunData.Close()
-        }
-        catch, err
-        {
-            ; When the Close() function is called "0x800706BE - The remote procedure call failed." is thrown even though the function successfully executes.
-            if(err.Message != "0x800706BE - The remote procedure call failed.")
-                this.LEGACY_UpdateStatus("Gem Farm not running")
-            else
-                this.LEGACY_UpdateStatus("Gem Farm Stopped")
-        }
-    }
+	Stop_Clicked()
+	{
+		for k,v in g_IriBrivMaster_StopFunctions
+		{
+			this.LEGACY_UpdateStatus("Stopping Addon Function: " . v)
+			v.Call()
+		}
+		this.LEGACY_UpdateStatus("Closing Gem Farm")
+		try
+		{
+			SharedRunData:=ComObjActive(this.GemFarmGUID)
+			SharedRunData.Close()
+		}
+		catch, err
+		{
+			; When the Close() function is called "0x800706BE - The remote procedure call failed." is thrown even though the function successfully executes.
+			if(err.Message != "0x800706BE - The remote procedure call failed.")
+				this.LEGACY_UpdateStatus("Gem Farm not running")
+			else
+				this.LEGACY_UpdateStatus("Gem Farm Stopped")
+		}
+	}
 
-    Connect_Clicked() ;TODO: Consolidate Connect and Run
-    {
-        this.LEGACY_UpdateStatus("Connecting to Gem Farm...")
-        this.UpdateGUIDFromLast()
-        Try
-        {
-            ComObjActive(this.GemFarmGUID)
-        }
-        Catch
-        {
-            this.LEGACY_UpdateStatus("Gem Farm not running")
-            return
-        }
-        g_SF.Hwnd := WinExist("ahk_exe " . g_IBM_Settings["ExeName"])
-        g_SF.Memory.OpenProcessReader()
+	Connect_Clicked() ;TODO: Consolidate Connect and Run
+	{
+		this.LEGACY_UpdateStatus("Connecting to Gem Farm...")
+		this.UpdateGUIDFromLast()
+		Try
+		{
+			ComObjActive(this.GemFarmGUID)
+		}
+		Catch
+		{
+			this.LEGACY_UpdateStatus("Gem Farm not running")
+			return
+		}
+		g_SF.Hwnd := WinExist("ahk_exe " . g_IBM_Settings["ExeName"])
+		g_SF.Memory.OpenProcessReader()
 		g_ServerCall.Update()
-        for k,v in g_IriBrivMaster_StartFunctions
-        {
-            v.Call()
-        }
-    }
+		for k,v in g_IriBrivMaster_StartFunctions
+		{
+			v.Call()
+		}
+	}
 
-    LEGACY_UpdateStatus(msg)
-    {
-        GuiControl, IBM_Home:, IBM_MainButtons_Status, % msg
-        if (msg=="")
+	LEGACY_UpdateStatus(msg)
+	{
+		GuiControl, IBM_Home:, IBM_MainButtons_Status, % msg
+		if (msg=="")
 			return
 		SetTimer, ClearButtonStatusMessage,-3000
-    }
+	}
 
 	;END STUFF COPIED FROM IC_BrivGemFarm_Component.ahk
 
 	Init()
-    {
+	{
 		this.GemFarmGUID:=g_SF.LoadObjectFromAHKJSON(A_LineFile . "\..\LastGUID_IBM_GemFarm.json")
-        g_Heroes:=new IC_BrivMaster_Heroes_Class()
+		g_Heroes:=new IC_BrivMaster_Heroes_Class()
 		this.LoadSettings()
 		g_SF:=New IC_BrivMaster_SharedFunctions_Class
+		this.PlatformTable:=this.GetPlatformTable() ;Required for the GUI
 		g_IriBrivMaster_GUI.Init() ;Must follow IBM memory manager being set up in g_SF
 		g_IriBrivMaster_GUI.UpdateGUISettings()
 		this.ChestSnatcher:=New IC_IriBrivMaster_ChestSnatcher_Class()
 		this.ResetStats() ;Before we initiate the timers
 		g_IriBrivMaster_StartFunctions.Push(ObjBindMethod(this, "Start"))
-        g_IriBrivMaster_StopFunctions.Push(ObjBindMethod(this, "Stop"))
+		g_IriBrivMaster_StopFunctions.Push(ObjBindMethod(this, "Stop"))
 		this.ServerCallFailCount:=0
 		this.MemoryReadFailCount:=0
 		this.GameSettingFileLocation:=""
@@ -127,11 +128,11 @@ Class IC_IriBrivMaster_Component
 			g_IriBrivMaster.RunVersionCheck()
 		if(g_IBM_Settings.HUB.IBM_Offsets_Check)
 			g_IriBrivMaster.CheckOffsetVersions()
-    }
+	}
 
 	GetSettingsTemplate() ;_DEFAULT property allows us to seperate the object structure from the default values, as some defaults are themselves objects
-    {
-        settings:={}
+	{
+		settings:={}
 		settings.IBM_Offline_Stack_Zone["_DEFAULT"]:=500
 		settings.IBM_Offline_Stack_Min["_DEFAULT"]:=300
 		settings.IBM_Route_Combine["_DEFAULT"]:=0
@@ -153,8 +154,6 @@ Class IC_IriBrivMaster_Component
 		settings.IBM_Route_Zones_Stack["_DEFAULT"]:=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 		settings.IBM_Online_Melf_Min["_DEFAULT"]:=349
 		settings.IBM_LevelManager_Input_Max["_DEFAULT"]:=5
-		settings.IBM_LevelManager_Boost_Use["_DEFAULT"]:=false
-		settings.IBM_LevelManager_Boost_Multi["_DEFAULT"]:=8
 		settings.IBM_Route_BrivJump_Q["_DEFAULT"]:=4
 		settings.IBM_Route_BrivJump_E["_DEFAULT"]:=0
 		settings.IBM_Route_BrivJump_M["_DEFAULT"]:=4
@@ -166,7 +165,7 @@ Class IC_IriBrivMaster_Component
 		settings.IBM_OffLine_Delay_Time["_DEFAULT"]:=15000
 		settings.IBM_ToggleAutoProgress_Timeout["_DEFAULT"]:=1000
 		settings.IBM_GetTargetStacks_Multiplier["_DEFAULT"]:=1.0
-		settings.IBM_Online_Stack_Max_Time["_DEFAULT"]:=200000
+		settings.IBM_Timeout_Dynamic_Stacking["_DEFAULT"]:=200000
 		settings.IBM_OffLine_Sleep_Time["_DEFAULT"]:=0
 		settings.IBM_Level_Options_Mod_Key["_DEFAULT"]:="Shift"
 		settings.IBM_Level_Options_Mod_Value["_DEFAULT"]:=10
@@ -184,7 +183,12 @@ Class IC_IriBrivMaster_Component
 		settings.IBM_Game_Path["_DEFAULT"]:="" ;Path and Launch command are user dependant so can't have a default
 		settings.IBM_Game_Launch["_DEFAULT"]:=""
 		settings.IBM_Game_Hide_Launcher["_DEFAULT"]:=false
-		settings.IBM_OffLine_Timeout["_DEFAULT"]:=5
+		settings.IBM_Timeout_Dynamic_Casino["_DEFAULT"]:=100000
+		settings.IBM_Timeout_Dynamic_Stacking["_DEFAULT"]:=200000
+		settings.IBM_Timeout_Static_Reset["_DEFAULT"]:=45000
+		settings.IBM_Timeout_Static_Launch["_DEFAULT"]:=50000
+		settings.IBM_Timeout_Static_Close["_DEFAULT"]:=10000
+		settings.IBM_Timeout_Static_Stuck["_DEFAULT"]:=60000
 		settings.IBM_Window_X["_DEFAULT"]:=0
 		settings.IBM_Window_Y["_DEFAULT"]:=900 ;To keep the window on-screen at 1080
 		settings.IBM_Window_Hide["_DEFAULT"]:=false
@@ -229,6 +233,8 @@ Class IC_IriBrivMaster_Component
 		settings.IBM_Scan_Codes[0,"_DEFAULT"]:=11
 		settings.IBM_OffLine_Blank_Stop["_DEFAULT"]:=false
 		settings.IBM_Theme_Current["_DEFAULT"]:={"DefaultText":0xC0C0C0,"WarningText":0xF18500,"SpecialText1":0x8888FF,"SpecialText2":0x88FF88,"TableText":0xE0E0E0,"EditText":0x333333,"TableBackground":0x555555,"WindowBackground":0x333333,"TrafficLightBad":0xF00000,"TrafficLightGood":0x00F000,"TrafficLightNeutral":0xFFC000,"DarkMode":true}
+		settings.IBM_Route_Adventure["_DEFAULT"]:=1054 ;Tall Tales
+		settings.IBM_Route_Patron["_DEFAULT"]:=0 ;None
 		settings.HUB:={} ;Separate hub-only settings
 		settings.HUB.IBM_ChestSnatcher_Options_Min_Gem["_DEFAULT"]:=500000
 		settings.HUB.IBM_ChestSnatcher_Options_Min_Gold["_DEFAULT"]:=500
@@ -245,19 +251,21 @@ Class IC_IriBrivMaster_Component
 		settings.HUB.IBM_Offsets_Check["_DEFAULT"]:=false
 		settings.HUB.IBM_Offsets_Lock_Pointers["_DEFAULT"]:=false
 		settings.HUB.IBM_Offsets_URL["_DEFAULT"]:="https://raw.githubusercontent.com/RLee-EN/BrivMaster-Imports/refs/heads/main/" ;Hidden setting to allow a different offset source to be used if wanted
-        settings.HUB.IBM_Window_Wide["_DEFAULT"]:=false
+		settings.HUB.IBM_Window_Wide["_DEFAULT"]:=false
 		settings.HUB.IBM_HOME_X["_DEFAULT"]:=0
 		settings.HUB.IBM_HOME_Y["_DEFAULT"]:=0
+		settings.HUB.IBM_Game_Platform_ID["_DEFAULT"]:=11 ;Defaults to Steam
+		settings.HUB.IBM_Game_Hide_Launcher_Startup["_DEFAULT"]:=false 
 		return settings
-    }
+	}
 
 	SaveSettings()
-    {
-        IC_BrivMaster_SharedFunctions_Class.WriteObjectToAHKJSON(IC_BrivMaster_SharedData_Class.SettingsPath, g_IBM_Settings)
+	{
+		IC_BrivMaster_SharedFunctions_Class.WriteObjectToAHKJSON(IC_BrivMaster_SharedData_Class.SettingsPath, g_IBM_Settings)
 		if (ComObjType(this.SharedRunData,"IID") or this.RefreshComObject())
 			this.SharedRunData.UpdateSettingsFromFile() ;Apply settings to the farm script
 		this.LEGACY_UpdateStatus("Settings saved")
-    }
+	}
 
 	RefreshComObject()
 	{
@@ -282,17 +290,17 @@ Class IC_IriBrivMaster_Component
 		}
         g_ServerCall.Update()
 		fncToCallOnTimer:=this.TimerFunction
-        SetTimer, %fncToCallOnTimer%, 600, 0
+		SetTimer, %fncToCallOnTimer%, 600, 0
 		this.SharedRunData:="" ;Reset this on start
 		if (this.RefreshComObject())
-        {
+		{
 			this.SharedRunData.IBM_BuyChests:=0 ;Cancel any orders open as the hub starts
-        }
+		}
 		this.ChestSnatcher.StartMessage()
 		this.SoftResetStats() ;Soft reset so we don't discard totals etc but also don't pick up a part run
 		this.UpdateStatus()
 		this.GameSettingsCheck()
-    }
+	}
 
     Stop()
     {
@@ -301,7 +309,7 @@ Class IC_IriBrivMaster_Component
         fncToCallOnTimer := this.TimerFunction
         SetTimer, %fncToCallOnTimer%, Off
 		g_IriBrivMaster_GUI.ResetStatusText()
-    }
+	}
 
 	SoftResetStats()
 	{
@@ -396,8 +404,8 @@ Class IC_IriBrivMaster_Component
 		GuiControl, IBM_Home:, IBM_Stats_Current_Briv, SB / Haste stacks: - / -
 		GuiControl, IBM_Home:, IBM_Stats_Last_Close, Last close: -
 		GuiControl, IBM_Home:, IBM_Stats_Boss_Hits, - / -
-        GuiControl, IBM_Home:, IBM_Stats_Rollbacks, 0
-        GuiControl, IBM_Home:, IBM_Stats_Bad_Auto, 0
+		GuiControl, IBM_Home:, IBM_Stats_Rollbacks, 0
+		GuiControl, IBM_Home:, IBM_Stats_Bad_Auto, 0
 	}
 
 	UpdateStats(dirty)
@@ -584,7 +592,7 @@ Class IC_IriBrivMaster_Component
 			}
 		}
 		;Current stats - Run time
-        if (this.Stats.PreviousRunEndTime)
+		if (this.Stats.PreviousRunEndTime)
 			runTime:=A_TickCount - this.Stats.PreviousRunEndTime
 		else
 			runTime:="-.-"
@@ -621,41 +629,41 @@ Class IC_IriBrivMaster_Component
 		else
 			this.MemoryReadFailCount++ ;The zone read is used as the trigger to refresh memory if needed, as it's done every time and should be available outside of a few moments during reset TODO: That isn't so true during offlines (even BrivMaster's ones)
 		;Current stats - Steelbones stacks
-  		stacks:=g_Heroes[58].ReadSBStacks()
-        if (stacks=="") ;If the memory read isn't current
-        {
-            if (this.Stats.StacksSB=="")
+		stacks:=g_Heroes[58].ReadSBStacks()
+		if (stacks=="") ;If the memory read isn't current
+		{
+			if (this.Stats.StacksSB=="")
 				message_SB:="-"
 			else
 				message_SB := this.Stats.StacksSB . " [last]"
-        }
+		}
 		else
 		{
-            this.Stats.StacksSB:=stacks
+			this.Stats.StacksSB:=stacks
 			message_SB:=this.Stats.StacksSB
-        }
+		}
 		;Current stats - Haste stacks
-        stacks:=g_Heroes[58].ReadHasteStacks()
+		stacks:=g_Heroes[58].ReadHasteStacks()
 		if (stacks=="") ;If the memory read isn't current
-        {
-            if (this.Stats.StacksHaste=="")
+		{
+			if (this.Stats.StacksHaste=="")
 				message_Haste:="-"
 			else
 				message_Haste := this.Stats.StacksHaste . " [last]"
-        }
+		}
 		else
 		{
-            this.Stats.StacksHaste:=stacks
+			this.Stats.StacksHaste:=stacks
 			message_Haste:=this.Stats.StacksHaste
-        }
-        GuiControl, IBM_Home:, IBM_Stats_Current_Area_Run_Time, % "Area / Run (s): " . ROUND(areaTime/1000,1) . " / " . Round(runTime/1000,1)
+		}
+		GuiControl, IBM_Home:, IBM_Stats_Current_Area_Run_Time, % "Area / Run (s): " . ROUND(areaTime/1000,1) . " / " . Round(runTime/1000,1)
 		GuiControl, IBM_Home:, IBM_Stats_Loop, % "Stage: " . this.SharedRunData.LoopString
 		GuiControl, IBM_Home:, IBM_Stats_Current_Briv, % "SB / Haste stacks: " . message_SB . " / " . message_Haste
 		GuiControl, IBM_Home:, IBM_Stats_Last_Close, % "Last close: " . this.SharedRunData.LastCloseReason
 		;Gem farm stats
 		GuiControl, IBM_Home:, IBM_Stats_Boss_Hits, % this.SharedRunData.BossesHitThisRun . " / " . this.SharedRunData.TotalBossesHit
-        GuiControl, IBM_Home:, IBM_Stats_Rollbacks, % this.SharedRunData.TotalRollBacks
-        GuiControl, IBM_Home:, IBM_Stats_Bad_Auto, % this.SharedRunData.BadAutoProgress
+		GuiControl, IBM_Home:, IBM_Stats_Rollbacks, % this.SharedRunData.TotalRollBacks
+		GuiControl, IBM_Home:, IBM_Stats_Bad_Auto, % this.SharedRunData.BadAutoProgress
 	}
 
 	StatsUpdateFastSlow(Stat,statTime) ;Helper for the slow/fast/total stat for each category
@@ -789,17 +797,17 @@ Class IC_IriBrivMaster_Component
 	}
 
 	RefreshUserData()
-    {
-        if(WinExist("ahk_exe " . g_IBM_Settings.IBM_Game_Exe)) ;Only update server when the game is open
-        {
-            g_SF.Memory.OpenProcessReader()
-            g_ServerCall.Update()
+	{
+		if(WinExist("ahk_exe " . g_IBM_Settings.IBM_Game_Exe)) ;Only update server when the game is open
+		{
+			g_SF.Memory.OpenProcessReader()
+			g_ServerCall.Update()
 			this.ServerCallFailCount:=0 ;Reset
 			this.MemoryReadFailCount:=0
 			if (ComObjType(this.SharedRunData,"IID") or this.RefreshComObject())
 				this.SharedRunData.IBM_ProcessSwap:=false
-        }
-    }
+		}
+	}
 
 	ParseRouteImportString(routeString)
 	{
@@ -877,7 +885,7 @@ Class IC_IriBrivMaster_Component
 	SetControl_OfflineStacking()
 	{
 		if (ComObjType(this.SharedRunData,"IID") or this.RefreshComObject())
-            this.SharedRunData.UpdateOutbound("IBM_RunControl_DisableOffline",!this.SharedRunData.IBM_RunControl_DisableOffline) ;Toggle
+			this.SharedRunData.UpdateOutbound("IBM_RunControl_DisableOffline",!this.SharedRunData.IBM_RunControl_DisableOffline) ;Toggle
 		else
 			Msgbox 48, "BrivMaster",Failed to update script ;48 is excamation, +0 for just OK
 	}
@@ -891,14 +899,14 @@ Class IC_IriBrivMaster_Component
 	}
 
 	UpdateStatus() ;Run by timer to update the GUI
-    {
+	{
 		comValid:=ComObjType(this.SharedRunData,"IID") OR this.RefreshComObject()
 		if ((comValid AND this.SharedRunData.IBM_ProcessSwap) OR this.ServerCallFailCount>2 OR this.MemoryReadFailCount>10) ;Irisiri - check we are still attached to the process
 		{
 			this.RefreshUserData()
 		}
 		if (comValid)
-        {
+		{
 			try ;The script stopping can cause the COM object to become invalid instantaneously
 			{
 				dirty:=this.SharedRunData.IBM_OutboundDirty
@@ -918,31 +926,31 @@ Class IC_IriBrivMaster_Component
 			{
 				g_IriBrivMaster_GUI.ResetStatusText()
 			}
-        }
-        else
-            g_IriBrivMaster_GUI.ResetStatusText()
+		}
+		else
+			g_IriBrivMaster_GUI.ResetStatusText()
 		if (A_TickCount>=this.NextGameSettingsCheck)
 			this.GameSettingsCheck()
-    }
+	}
 
 	LoadSettings()
-    {
-        needSave:=false
-        template:=this.GetSettingsTemplate() ;Needs in all cases, either to create in full, or for key checks
+	{
+		needSave:=false
+		template:=this.GetSettingsTemplate() ;Needs in all cases, either to create in full, or for key checks
 		g_IBM_Settings:=IC_BrivMaster_SharedFunctions_Class.LoadObjectFromAHKJSON(IC_BrivMaster_SharedData_Class.SettingsPath) ;Cannot use the instance as it might not be set up yet - it needs the exe name from these settings to set up .Memory
-        if (!IsObject(g_IBM_Settings)) ;If no settings are read in create a new default set
-        {
+		if (!IsObject(g_IBM_Settings)) ;If no settings are read in create a new default set
+		{
 			g_IBM_Settings:=this.CreateDefaultSettingsFromTemplate(template)
-            needSave:=true
-        }
-        else
-        {
+			needSave:=true
+		}
+		else
+		{
 			needSave:=this.CheckForExtraSettings(g_IBM_Settings, template) ;Delete extra settings, without removing object-based values for them
-            needSave:=this.CheckForMissingSettings(g_IBM_Settings,template) OR needSave ;Add extra settings, along with their default values. Order matters here due to lazy OR
-        }
-        if (needSave)
-            this.SaveSettings()
-    }
+			needSave:=this.CheckForMissingSettings(g_IBM_Settings,template) OR needSave ;Add extra settings, along with their default values. Order matters here due to lazy OR
+		}
+		if (needSave)
+			this.SaveSettings()
+	}
 
 	CheckForMissingSettings(settings, template) ;Check all elements of settings and remove any that do not exist in template, up to those with _DEFAULT properties
 	{
@@ -1011,10 +1019,10 @@ Class IC_IriBrivMaster_Component
 		}
 	}
 
-    UpdateSetting(setting, value) ;TODO: With no logic around the assignment this seems like a bit of a pointless function
-    {
-        g_IBM_Settings[setting]:=value
-    }
+	UpdateSetting(setting, value) ;TODO: With no logic around the assignment this seems like a bit of a pointless function
+	{
+		g_IBM_Settings[setting]:=value
+	}
 
 	UpdateRouteSetting(setting,toggleZone)
 	{
@@ -1028,7 +1036,7 @@ Class IC_IriBrivMaster_Component
 		championData:={} ;This will be per seat, then champID with a list of formations containing, eg championData[1][58] being [1,3,4] if Briv is in Q/E/M but not W
 		if (!g_Heroes.Init()) ;Initialise the hero handler, otherwise we won't be able to get champion details - likely if this fails the formation reads would also fail anyway
 			return
-        slots:=["Q","W","E"]
+		slots:=["Q","W","E"]
 		loop 3
 			this.IBM_GetGUIFormationData_ProcessFormation(championData,slots[A_Index],g_SF.Memory.GetFormationByFavorite(A_Index))
 		this.IBM_GetGUIFormationData_ProcessFormation(championData,"M",g_SF.Memory.GetActiveModronFormation())
@@ -1050,15 +1058,15 @@ Class IC_IriBrivMaster_Component
 			if heroID>0
 			{
 				seat:=g_Heroes[heroID].Seat
-                if !(championData.hasKey(seat) AND championData[seat].hasKey(heroID)) ;Create entry for this champ
-                {
-                    championData[seat,heroID,"Name"]:=g_Heroes[heroID].ReadName() ;We need to create the array if it doesn't yet exist
-                    championData[seat,heroID,"Q"]:=false
-                    championData[seat,heroID,"W"]:=false
-                    championData[seat,heroID,"E"]:=false
-                    championData[seat,heroID,"M"]:=false
-                }
-                championData[seat,heroID,index]:=true
+				if !(championData.hasKey(seat) AND championData[seat].hasKey(heroID)) ;Create entry for this champ
+				{
+					championData[seat,heroID,"Name"]:=g_Heroes[heroID].ReadName() ;We need to create the array if it doesn't yet exist
+					championData[seat,heroID,"Q"]:=false
+					championData[seat,heroID,"W"]:=false
+					championData[seat,heroID,"E"]:=false
+					championData[seat,heroID,"M"]:=false
+				}
+				championData[seat,heroID,index]:=true
 			}
 		}
 	}
@@ -1079,27 +1087,30 @@ Class IC_IriBrivMaster_Component
 		if(IsObject(this.Elly_NonGemFarm)) ;Stop any existing timer
 			this.Elly_NonGemFarm.Stop()
 		this.Elly_NonGemFarm:=New IC_BrivMaster_EllywickDealer_Class(this.IBM_Elly_GetNonGemFarmCards("Min"),this.IBM_Elly_GetNonGemFarmCards("Max"))
-        this.Elly_NonGemFarm.Start()
+		this.Elly_NonGemFarm.Start()
 		g_IriBrivMaster_GUI.SetEllyNonGemFarmStatus("Started")
-    }
+	}
 
-    IBM_Elly_StopNonGemFarm()
-    {
-        this.Elly_NonGemFarm.Stop()
-        this.Elly_NonGemFarm:=""
+	IBM_Elly_StopNonGemFarm()
+	{
+		this.Elly_NonGemFarm.Stop()
+		this.Elly_NonGemFarm:=""
 		g_IriBrivMaster_GUI.SetEllyNonGemFarmStatus("Stopped")
-    }
+	}
 
-    IBM_Elly_GetNonGemFarmCards(capType:="Min")
-    {
-        cards:=[]
-        Loop 5
-        {
-            GuiControlGet, cap, IBM_Home:, IBM_NonGemFarm_Elly_%capType%_%A_Index% ;Eg IBM_NonGemFarm_Elly_Min_1
-            cards.Push(cap)
-        }
-        return cards
-    }
+	IBM_Elly_GetNonGemFarmCards(capType:="Min")
+	{
+		cards:=[]
+		Loop 5
+		{
+			GuiControlGet, cap, IBM_Home:, IBM_NonGemFarm_Elly_%capType%_%A_Index% ;Eg IBM_NonGemFarm_Elly_Min_1
+			if cap is integer
+				cards.Push(cap)
+			else
+				cards.Push(0) ;Treat blank as zero
+		}
+		return cards
+	}
 
 	RunVersionCheck() ;Main version check wrapper
 	{
@@ -1109,23 +1120,23 @@ Class IC_IriBrivMaster_Component
 	}
 
 	VersionCheckBM()
-    {
+	{
 		details:=this.GetCurrentBMDetails()
 		addonDetails:=this.BasicServerCaller.BasicServerCall(this.ExtractAddonUrl(details[2]))
 		comparison:=this.VersionComparison(addonDetails.Version,details[1])
-        versionString:="Briv Master: "
+		versionString:="Briv Master: "
 		if(comparison.GT)
 		{
-            versionString.=details[1] . " - New version " . comparison.TestVersion . " available"
+			versionString.=details[1] . " - New version " . comparison.TestVersion . " available"
 			colour:=g_IriBrivMaster_GUI.Theme.GetThemeTextColour("TrafficLightNeutral")
 		}
-        else if(comparison.E)
-        {
+		else if(comparison.E)
+		{
 			versionString.=details[1]
 			colour:=g_IriBrivMaster_GUI.Theme.GetThemeTextColour("TrafficLightGood")
 		}
 		else
-        {
+		{
 			versionString.=details[1] . " - Server has " . comparison.TestVersion
 			colour:=g_IriBrivMaster_GUI.Theme.GetThemeTextColour("SpecialText1") ;Not TrafficLightBad as this isn't necessarily a problem - it's probably me, or you dear reader, working on updates
 		}
@@ -1211,22 +1222,42 @@ Class IC_IriBrivMaster_Component
 			return "<Unable to read>"
 	}
 
+	GetPlatformTable()
+	{
+		platforms:=[]
+		platforms.Push({ID:11,Name:"Steam"})
+		platforms.Push({ID:18,Name:"CNE"})
+		platforms.Push({ID:21,Name:"EGS"})
+		return platforms
+	}
+	
+	GetPlatformIndexByID(platformID)
+	{
+		for i,platform in this.PlatformTable
+		{
+			if(platform.ID==platformID)
+				return i
+		}
+	}
+	
+	GetPlatformDropdownString()
+	{
+		optionString:=""
+		for i,platform in this.PlatformTable
+		{
+			optionString.=platform.Name . " (" . platform.ID . ")|" . (platform.ID==g_IBM_Settings.HUB["IBM_Game_Platform_ID"] ? "|":"")
+		}
+		return optionString
+	}
+
 	GetPlatform(platformID)
 	{
-		switch platformID
+		for i,platform in this.PlatformTable
 		{
-			case 5: return "Kongregate (" . platformID . ")"
-			case 6: return "Armor Games (" . platformID . ")"
-			case 11: return "Steam (" . platformID . ")"
-			case 13: return "Servers (" . platformID . ")"
-			case 14: return "Servers (" . platformID . ")"
-			case 16: return "Sony (" . platformID . ")"
-			case 17: return "Xbox (" . platformID . ")"
-			case 18: return "CNE Games (" . platformID . ") - treated as Steam (11)"
-			case 20: return "Kartridge (" . platformID . ")"
-			case 21: return "EGS (" . platformID . ")" ;Note this is the full 'Epic Games Store' in the client
-			Default: return "UNKNOWN (" . platformID . ")"
+			if(platform.ID==platformID)
+				return platform.Name . " (" . platform.ID . ")"
 		}
+		return "UNKNOWN (" . platformID . ")"
 	}
 
 	GetPlayServerFriendly() ;Finds the ps19.idlechampions.com portion, or returns a descriptive error
@@ -1282,20 +1313,15 @@ Class IC_IriBrivMaster_Component
 		GuiControl, IBM_Home:, IBM_Offsets_Text_Imports_Current,% "Current: " . currentImports
 		GuiControl, IBM_Home:+%colour%, IBM_Offsets_Text_Imports_Current%index%
 		platformID:=g_SF.Memory.ReadPlatform()
-		if(!platformID)
+		if(platformID AND platformID!=g_IBM_Settings.HUB["IBM_Game_Platform_ID"])
 		{
-			prompt:="Briv Master was unable to read your platform ID from the game. Please enter one of the following:"
-			prompt.="`nSteam or CNE Standalone: 11"
-			prompt.="`nEpic Games Store: 21"
-			InputBox, platformID , Platform Selection, %prompt%,,,,,,,, 11
-			platformID:=Trim(platformID)
-			if(ErrorLevel==1 OR (platformID!=11 AND platformID!=21)) ;ErrorLevel of 1 means cancel was pressed
-				return
+			prompt:="The configured platform: " . this.GetPlatform(g_IBM_Settings.HUB["IBM_Game_Platform_ID"]) . " does not match the one read from memory: " . this.GetPlatform(platformID)
+			prompt.="`nPlease correct the platform selection and try again"
+			Msgbox 48, Briv Master, % prompt ;48 is excamation, +0 for just OK
+			return
 		}
-		GuiControl, IBM_Home:, IBM_Offsets_Text_Platform, % "Platform: " . this.GetPlatform(platformID)
-		if(platformID==18) ;CNE client should be treated as Steam
-			platformID:=11
-		remoteURL:=g_IBM_Settings.HUB.IBM_Offsets_URL . "IC_Offsets_Header_P" . platformID . ".csv"
+		GuiControl, IBM_Home:, IBM_Offsets_Text_Platform, % "Platform: " . this.GetPlatform(g_IBM_Settings.HUB["IBM_Game_Platform_ID"])
+		remoteURL:=g_IBM_Settings.HUB.IBM_Offsets_URL . "IC_Offsets_Header_P" . (g_IBM_Settings.HUB["IBM_Game_Platform_ID"]==18 ? 11 : g_IBM_Settings.HUB["IBM_Game_Platform_ID"]) . ".csv" ;Overide CNE client (18) to Steam (11)
 		this.BasicServerCaller:=new IBM_ServerCall_Class() ;For basic server calls when version checking only - we won't be attached to the farm script / game at start up
 		offsetHeader:=this.BasicServerCaller.BasicServerCallRaw(remoteURL) ;CSV: Import version, import revision, pointer version, pointer revision
 		splitCSV:=StrSplit(offsetHeader,",")
@@ -1341,20 +1367,15 @@ Class IC_IriBrivMaster_Component
 		GuiControl, IBM_Home:, IBM_Offsets_Text_Imports_Current,% "Current: " . currentImports
 		GuiControl, IBM_Home:+%colour%, IBM_Offsets_Text_Imports_Current%index%
 		platformID:=g_SF.Memory.ReadPlatform()
-		if(!platformID)
+		if(platformID AND platformID!=g_IBM_Settings.HUB["IBM_Game_Platform_ID"])
 		{
-			prompt:="Briv Master was unable to read your platform ID from the game. Please enter one of the following:"
-			prompt.="`nSteam: 11"
-			prompt.="`nEpic Games Store: 21"
-			InputBox, platformID , Platform Selection, %prompt%,,,,,,,, 11
-			platformID:=Trim(platformID)
-			if(ErrorLevel==1 OR (platformID!=11 AND platformID!=21)) ;ErrorLevel of 1 means cancel was pressed
-				return
+			prompt:="The configured platform: " . this.GetPlatform(g_IBM_Settings.HUB["IBM_Game_Platform_ID"]) . " does not match the one read from memory: " . this.GetPlatform(platformID)
+			prompt.="`nPlease correct the platform selection and try again"
+			Msgbox 48, Briv Master, % prompt ;48 is excamation, +0 for just OK
+			return
 		}
-		GuiControl, IBM_Home:, IBM_Offsets_Text_Platform, % "Platform: " . this.GetPlatform(platformID)
-		if (platformID==18) ;CNE client should be treated as Steam
-			platformID:=11
-		remoteURL:=g_IBM_Settings.HUB.IBM_Offsets_URL . "IC_Offsets_Header_P" . platformID . ".csv"
+		GuiControl, IBM_Home:, IBM_Offsets_Text_Platform, % "Platform: " . this.GetPlatform(g_IBM_Settings.HUB["IBM_Game_Platform_ID"])
+		remoteURL:=g_IBM_Settings.HUB.IBM_Offsets_URL . "IC_Offsets_Header_P" . (g_IBM_Settings.HUB["IBM_Game_Platform_ID"]==18 ? 11 : g_IBM_Settings.HUB["IBM_Game_Platform_ID"]) . ".csv" ;Overide CNE client (18) to Steam (11)
 		this.BasicServerCaller:=new IBM_ServerCall_Class() ;For basic server calls when version checking only - we won't be attached to the farm script / game at start up
 		offsetHeader:=this.BasicServerCaller.BasicServerCallRaw(remoteURL) ;CSV: Import version, import revision, pointer version, pointer revision
 		splitCSV:=StrSplit(offsetHeader,",")
@@ -1377,10 +1398,11 @@ Class IC_IriBrivMaster_Component
 			prompt:="Confirm download of the following:"
 			prompt.=g_IBM_Settings.HUB.IBM_Offsets_Lock_Pointers ? "`nPointers preserved" : "`nPointers: " . splitCSV[3] . " " . splitCSV[4]
 			prompt.="`nImports: " . splitCSV[1] . " " . splitCSV[2]
+			prompt.="`nFor platform: " . (g_IBM_Settings.HUB["IBM_Game_Platform_ID"]==18 ? this.GetPlatform(g_IBM_Settings.HUB["IBM_Game_Platform_ID"]) . " treated as " . this.GetPlatform(11) : this.GetPlatform(g_IBM_Settings.HUB["IBM_Game_Platform_ID"]))
 			Msgbox 36, Briv Master, %prompt% ;32 is question, 4 is Yes/No
 			ifMsgBox Yes
 			{
-				remoteURL:=g_IBM_Settings.HUB.IBM_Offsets_URL . "IC_Offsets_Data_P" . platformID . ".zlib"
+				remoteURL:=g_IBM_Settings.HUB.IBM_Offsets_URL . "IC_Offsets_Data_P" . (g_IBM_Settings.HUB["IBM_Game_Platform_ID"]==18 ? 11 : g_IBM_Settings.HUB["IBM_Game_Platform_ID"]) . ".zlib"
 				offsetZlib:=this.BasicServerCaller.BasicServerCallRaw(remoteURL) ;Binary data
 				if(offsetZlib)
 				{
@@ -1446,33 +1468,47 @@ class IC_IriBrivMaster_ChestSnatcher_Class ;A class for managing buying and open
 	{
 		this.Messages:={}
 		this.NextDailyClaimCheck:=A_TickCount+180000 ;Wait 3min before making the first check, to avoid spamming calls whilst testing things
+		this.InDianaCheese:=false
 	}
 
 	Snatch() ;Process chest purchase orders
 	{
-		if (g_IriBrivMaster.SharedRunData.IBM_BuyChests) ;Check daily rewards or Open chests. Note it is assumed that SharedRunData has been checked as valid before calling this function
+		if (g_IBM_Settings["IBM_Level_Diana_Cheese"] AND g_SF.InDianaCheeseWindow()) ;Do not make servercalls during the Diana cheese window
 		{
-			if (g_IBM_Settings.HUB.IBM_DailyRewardClaim_Enable AND A_TickCount>=this.NextDailyClaimCheck)
+			if(!this.InDianaCheese)
 			{
-				this.ClaimDailyRewards()
-				g_IriBrivMaster_GUI.IBM_ChestsSnatcher_Status_Update()
+				this.AddMessage("General","Servercalls paused whilst Diana Cheese is active")
+				this.InDianaCheese:=true
 			}
-			else if (g_IBM_Settings.HUB.IBM_ChestSnatcher_Options_Open_Gold OR g_IBM_Settings.HUB.IBM_ChestSnatcher_Options_Open_Silver)
-			{
-				this.CheckOpenChests()
-			}
-			else
-				g_IriBrivMaster.SharedRunData.IBM_BuyChests:=0 ;Cancel the order
 		}
-		else if (g_IBM_Settings.HUB.IBM_ChestSnatcher_Options_Min_Buy)
+		else
 		{
-			gems:=g_IriBrivMaster.CurrentGems - g_IBM_Settings.HUB.IBM_ChestSnatcher_Options_Min_Gem
-			amountG:=Min(Floor(gems / g_IriBrivMaster.CONSTANT_goldCost), g_IriBrivMaster.CONSTANT_serverRateBuy)
-			if (amountG>=g_IBM_Settings.HUB.IBM_ChestSnatcher_Options_Min_Buy)
+			if(this.InDianaCheese)
+				this.InDianaCheese:=false
+			if (g_IriBrivMaster.SharedRunData.IBM_BuyChests) ;Check daily rewards or Open chests. Note it is assumed that SharedRunData has been checked as valid before calling this function
 			{
-				this.AddMessage("Buy","No open order, buying " . amountG . " Gold...")
-				this.BuyChests(2, amountG)
-				g_IriBrivMaster_GUI.IBM_ChestsSnatcher_Status_Update()
+				if (g_IBM_Settings.HUB.IBM_DailyRewardClaim_Enable AND A_TickCount>=this.NextDailyClaimCheck)
+				{
+					this.ClaimDailyRewards()
+					g_IriBrivMaster_GUI.IBM_ChestsSnatcher_Status_Update()
+				}
+				else if (g_IBM_Settings.HUB.IBM_ChestSnatcher_Options_Open_Gold OR g_IBM_Settings.HUB.IBM_ChestSnatcher_Options_Open_Silver)
+				{
+					this.CheckOpenChests()
+				}
+				else
+					g_IriBrivMaster.SharedRunData.IBM_BuyChests:=0 ;Cancel the order
+			}
+			else if (g_IBM_Settings.HUB.IBM_ChestSnatcher_Options_Min_Buy)
+			{
+				gems:=g_IriBrivMaster.CurrentGems - g_IBM_Settings.HUB.IBM_ChestSnatcher_Options_Min_Gem
+				amountG:=Min(Floor(gems / g_IriBrivMaster.CONSTANT_goldCost), g_IriBrivMaster.CONSTANT_serverRateBuy)
+				if (amountG>=g_IBM_Settings.HUB.IBM_ChestSnatcher_Options_Min_Buy)
+				{
+					this.AddMessage("Buy","No open order, buying " . amountG . " Gold...")
+					this.BuyChests(2, amountG)
+					g_IriBrivMaster_GUI.IBM_ChestsSnatcher_Status_Update()
+				}
 			}
 		}
 	}
@@ -1576,7 +1612,7 @@ class IC_IriBrivMaster_ChestSnatcher_Class ;A class for managing buying and open
 	}
 
 	BuyChests(chestID:=1, numChests:=100)
-    {
+	{
 		if(numChests > 0)
 		{
 			callTime:=A_TickCount
@@ -1604,7 +1640,7 @@ class IC_IriBrivMaster_ChestSnatcher_Class ;A class for managing buying and open
 				g_IriBrivMaster.ServerCallFailCount++
 			}
 		}
-    }
+	}
 
 	CheckOpenChests()
 	{
@@ -1639,13 +1675,13 @@ class IC_IriBrivMaster_ChestSnatcher_Class ;A class for managing buying and open
 	}
 
 	OpenChests(chestID:=1,numChests:=250)
-    {
+	{
 		chestName:=chestID==2 ? "Gold" : "Silver"
-        callTime:=A_TickCount
+		callTime:=A_TickCount
 		this.AddMessage("Open","Opening " . numChests . " " . chestName . "...")
 		chestResults:=g_ServerCall.CallOpenChests(chestID, numChests)
 		serverCallTime:=A_TickCount-callTime
-        if (!chestResults.success)
+		if (!chestResults.success)
 		{
 			if (!chestResults.failure_reason)
 			{
@@ -1664,7 +1700,7 @@ class IC_IriBrivMaster_ChestSnatcher_Class ;A class for managing buying and open
 			}
 			return
 		}
- 		if (chestID==1)
+		if (chestID==1)
 		{
 			g_IriBrivMaster.Chests.OpenedSilver+=numChests
 			g_IriBrivMaster.Chests.CurrentSilver:=chestResults.chests_remaining
@@ -1677,12 +1713,12 @@ class IC_IriBrivMaster_ChestSnatcher_Class ;A class for managing buying and open
 		    g_IriBrivMaster.Chests.CurrentGold:=chestResults.chests_remaining
 			this.AddMessage("Open","Opened " . numChests " Gold in " . serverCallTime . "ms")
 		}
-    }
+	}
 }
 
 class IC_BrivMaster_EllywickDealer_Class ;A class for re-rolling Ellywick outside of gem farming
 {
-    __New(minCards,maxCards)
+	__New(minCards,maxCards)
 	{
 		this.CasinoTimer:=ObjBindMethod(this, "Casino")
 		this.Redraws:=0

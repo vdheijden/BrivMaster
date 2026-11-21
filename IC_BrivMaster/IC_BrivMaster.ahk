@@ -13,6 +13,7 @@ global g_TabList:=""
 global g_MouseTooltips:={}
 g_MouseTooltips.ByName:={}
 g_MouseTooltips.ByHandle:={}
+g_MouseTooltips.Enabled:=true
 global g_TabControlHeight
 global g_TabControlStartHeight
 global g_TabControlWidth
@@ -46,35 +47,36 @@ GuiControl, IBM_Home:MoveDraw, ModronTabControl, % "w" . g_TabControlWidth . " h
 Gui, IBM_Home:Show, % "x" . g_IBM_Settings.HUB.IBM_HOME_X . " y" . g_IBM_Settings.HUB.IBM_HOME_Y . " w" . g_TabControlWidth+10 . " h" . g_TabControlHeight+g_TabControlStartHeight+6 . " NA", % "Briv Master Home"
 g_IriBrivMaster_GUI.ApplyTooltips() ;Must be after controls are created by Gui, Show
 OnMessage(0x200, "CheckControlForTooltip") ;WM_MOUSEMOVE for tooltip tracking
+OnMessage(0x203, "DoubleClickHandler")
 
 ClearButtonStatusMessage()
 {
-    g_IriBrivMaster.LEGACY_UpdateStatus("")
+	g_IriBrivMaster.LEGACY_UpdateStatus("")
 }
 
 Reload_Clicked()
 {
-    Reload
-    return
+	Reload
+	return
 }
 
 Launch_Clicked()
 {
 	programLoc:=g_IBM_Settings.IBM_Game_Launch
-    try
-    {
-		if (g_IBM_Settings.IBM_Game_Hide_Launcher)
+	try
+	{
+		if (g_IBM_Settings.HUB.IBM_Game_Hide_Launcher_Startup)
 			Run, %programLoc%,,Hide, openPID
 		else
 			Run, %programLoc%,,,openPID
-    }
-    catch
-    {
-        MsgBox, 48,Briv Master, Unable to launch game`nVerify the game location is set properly in the Briv Master settings
-    }
+	}
+	catch
+	{
+		MsgBox, 48,Briv Master, Unable to launch game`nVerify the game location is set properly in the Briv Master settings
+	}
 	if (g_SF.GetProcessName(openPID)==g_IBM_Settings.IBM_Game_Exe) ;If we launch the game .exe directly (e.g. Steam) the Run PID will be the game, but for things like EGS it will not so we need to find it
 		g_SF.PID:=openPID
-    else
+	else
 	{
 		Process, Exist, % g_IBM_Settings.IBM_Game_Exe
 		g_SF.PID:=ErrorLevel
@@ -84,26 +86,35 @@ Launch_Clicked()
 
 IBM_HomeGuiClose()
 {
-    MsgBox 36,Briv Master Home,Are you sure you want to `exit? ;4 for Yes/No, 32 for Question Mark
-    IfMsgBox Yes
-        ExitApp
-    IfMsgBox No
-        return True
+	MsgBox 36,Briv Master Home,Are you sure you want to `exit? ;4 for Yes/No, 32 for Question Mark
+	IfMsgBox Yes
+		ExitApp
+	IfMsgBox No
+		return True
 }
 
 CheckControlForTooltip() ;Shows a tooltip if the control with mouseover has a tooltip associated with it
 {
-	MouseGetPos,,,,hControl,2 ;Get the Hwnd
-	if(g_MouseToolTips.ByHandle.HasKey(hControl))
-	{
-		ToolTip % g_MouseToolTips.ByHandle[hControl].Tip
-		SetTimer, HideToolTip, -3000
-		return
+	if(g_MouseTooltips.Enabled)
+		{
+		MouseGetPos,,,,hControl,2 ;Get the Hwnd
+		if(g_MouseToolTips.ByHandle.HasKey(hControl))
+		{
+			ToolTip % g_MouseToolTips.ByHandle[hControl].Tip
+			SetTimer, HideToolTip, -3000
+			return
+		}
+		ToolTip
 	}
-	ToolTip
 }
 
 HideToolTip()
 {
-    ToolTip
+	ToolTip
+}
+
+HideToolTipAndEnable()
+{
+	ToolTip
+	g_MouseTooltips.Enabled:=true
 }
