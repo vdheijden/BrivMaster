@@ -56,9 +56,9 @@
 		Gui, IBM_Home:Add, Picture, x+%buttonSpacing% h-1 w%buttonWidth% gIBM_MainButtons_Save vIBM_MainButtons_Save, %A_LineFile%\..\..\Resources\Save.png
 		Gui, IBM_Home:Add, Picture, x+%buttonSpacing% h-1 w%buttonWidth% gIBM_MainButtons_Reset vIBM_MainButtons_Reset, %A_LineFile%\..\..\Resources\Reset.png
 		this.AddToolTip("IBM_MainButtons_Start", "Start Gem Farm")
-        this.AddToolTip("IBM_MainButtons_Stop", "Stop Gem Farm")
-        this.AddToolTip("IBM_MainButtons_Connect", "Reconnect to Gem Farm script")
-        this.AddToolTip("IBM_MainButtons_Save", "Save Briv Master settings from all tabs")
+		this.AddToolTip("IBM_MainButtons_Stop", "Stop Gem Farm")
+		this.AddToolTip("IBM_MainButtons_Connect", "Reconnect to Gem Farm script")
+		this.AddToolTip("IBM_MainButtons_Save", "Save Briv Master settings from all tabs")
 		this.AddToolTip("IBM_MainButtons_Reset", "Reset stats")
 		;Tab control
 		g_TabControlStartHeight:=buttonWidth+7
@@ -67,7 +67,9 @@
 		this.Theme.UseThemeTitleBar("IBM_Home")
 		Gui, IBM_Home:Show, %  "x" . g_IBM_Settings.HUB.IBM_HOME_X . " y" . g_IBM_Settings.HUB.IBM_HOME_Y . " w" . g_TabControlWidth+10 . " h" . g_TabControlHeight+g_TabControlStartHeight+6  . " NA", % "Briv Master Home (Loading...)"
 
+		;++++++++++++++++++++++++++++++++++++++++++++
 		;++++++++++++++++++HOME TAB++++++++++++++++++
+		;++++++++++++++++++++++++++++++++++++++++++++
 		Gui, IBM_Home:Tab, Home
 		;Run control
 		Gui, IBM_Home:Font, w700
@@ -425,18 +427,18 @@
 		Gui, IBM_Home:Add, Edit, +%editTextColour%  w12 x+0 Number Limit1 vIBM_NonGemFarm_Elly_Max_5
 		Gui, IBM_Home:Add, Text, x+15 yp-1 w%textWidth% r2 Right vIBM_NonGemFarm_Elly_Status
 		
+		;++++++++++++++++++++++++++++++++++++++++++++
 		;++++++++++++++++++GAME TAB++++++++++++++++++
+		;++++++++++++++++++++++++++++++++++++++++++++
 		Gui, IBM_Home:Tab, Game
 		;Game location
 		Gui, IBM_Home:Font, w700
-		Gui, IBM_Home:Add, Groupbox, Section xm+2 ym+48 w%groupWidth% h127 vIBM_Group_Game_Location, Game Location
+		Gui, IBM_Home:Add, Groupbox, Section xm+2 ym+48 w%groupWidth% h151 vIBM_Group_Game_Location, Game Location
 		Gui, IBM_Home:Font, w400
 		Gui, IBM_Home:Add, Text, w55 xs+5 ys+20 h18 0x200, Executable:
 		editWidth:=groupWidth-255
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w%editWidth% x+5 vIBM_Game_Exe gIBM_Game_Location_Settings
 		this.AddToolTip("IBM_Game_Exe", "The game executable file name, normally IdleDragons.exe")
-		Gui, IBM_Home:Add, CheckBox, x+10 h18 0x200 vIBM_Game_Hide_Launcher gIBM_Game_Location_Settings, Hide launcher
-		this.AddToolTip("IBM_Game_Hide_Launcher", "Select this option to hide the window created by the launch command. Useful when using an alternative launcher and do not want to see the window it creates. Do not use when launching the game directly")
 		buttonX:=groupWidth-83
 		Gui, IBM_Home:Add, Button, xs+%buttonX% yp+0 w75 vIBM_Game_Copy_From_Game gIBM_Game_Copy_From_Game, Copy from IC
 		editWidth:=groupWidth-74
@@ -446,6 +448,22 @@
 		Gui, IBM_Home:Add, Text, w55 r2 xs+5 y+5 h18, Launch Command:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w40 x+5 w%editWidth% r2 vIBM_Game_Launch gIBM_Game_Location_Settings
 		this.AddToolTip("IBM_Game_Launch", "The launch command for the game. This is seperated to allow the use of different launchers")
+		
+		Gui, IBM_Home:Add, Text, xs+5 y+5 w55 h18 0x200, Platform:
+		Gui, IBM_Home:Add, DropDownList, w80 x+5 AltSubmit vIBM_Game_Platform_ID gIBM_Game_Platform_ID, % g_IriBrivMaster.GetPlatformDropdownString()
+		
+		if(this.Wide)
+			Gui, IBM_Home:Add, Text, x+20 h18 0x200, Hide launcher:
+		else
+			Gui, IBM_Home:Add, Text, xs+5 y+5 h18 0x200, Hide launcher:
+		Gui, IBM_Home:Add, CheckBox, x+3 h18 0x200 vIBM_Game_Hide_Launcher_Startup gIBM_Generic_Hub_Setting_Int, Manual start
+		Gui, IBM_Home:Add, CheckBox, x+10 h18 0x200 vIBM_Game_Hide_Launcher gIBM_Generic_Setting_Int, Whilst farming
+		this.AddToolTip("IBM_Game_Hide_Launcher_Startup", "Select this option to hide the window created by the launch command when using the button above to start the game manually.`nUseful when using an alternative launcher and do not want to see the window it creates. Do not use when launching the game directly")
+		this.AddToolTip("IBM_Game_Hide_Launcher", "Select this option to hide the window created by the launch command when the game is started automatically by the script.`nUseful when using an alternative launcher and do not want to see the window it creates. Do not use when launching the game directly")
+		
+		GuiControlGet, lastItemPos, IBM_Home:Pos,IBM_Game_Hide_Launcher ;Used for setting the next box
+		groupEnd:=lastItemPosY+lastItemPosH-46 ;The 48 hard coded for xm, +2 for spacing
+		GuiControl, IBM_Home:Move, IBM_Group_Game_Location, h%groupEnd%
 		GuiControlGet, groupPos, IBM_Home:Pos,IBM_Group_Game_Location ;Used for setting the next box
 		nextGroupStart:=groupPosY+groupPosH+1
 		;Window settings
@@ -627,7 +645,9 @@
 		Gui, IBM_Home:Add, CheckBox, xs+10 y+4 h18 vIBM_Version_Check gIBM_Generic_Hub_Setting_Int,On load
 		this.AddToolTip("IBM_Version_Check", "Select to automatically check for updates when Briv Master Home starts")
 
-		;++++++++++++++++++ROUTE TAB++++++++++++++++++
+		;++++++++++++++++++++++++++++++++++++++++++++
+		;++++++++++++++++++ROUTE TAB+++++++++++++++++
+		;++++++++++++++++++++++++++++++++++++++++++++
 		Gui, IBM_Home:Tab, Route
 		;Combine
 		Gui, IBM_Home:Font, w700
@@ -678,10 +698,19 @@
 			Gui, IBM_Home:Add, Button, w60 xs+256 yp+0 h22 vIBM_Route_Import_Button gIBM_Route_Import_Button, Import
 			Gui, IBM_Home:Add, Button, w60 x+10 h22 vIBM_Route_Export_Button gIBM_Route_Export_Button, Export
 		}
+		
 		this.AddToolTip("IBM_Route_BrivJump_Q", "The number of additional zones Briv jumps using the Q formation")
 		this.AddToolTip("IBM_Route_BrivJump_E", "The number of additional zones Briv jumps using the E formation when feat swapping. Ignored if Briv is not saved in E")
-		this.AddToolTip("IBM_Route_BrivJump_M", "The number of additional zones Briv jumps using the M (Modron) formation when feat swapping. Used when combining to determine the initial jump.")
-		GuiControlGet, lastItemPos, IBM_Home:Pos,IBM_Route_Export_Button ;Used for setting the next box
+		this.AddToolTip("IBM_Route_BrivJump_M", "The number of additional zones Briv jumps using the M (Modron) formation when feat swapping. Used when combining to determine the initial jump")
+		
+		Gui, IBM_Home:Add, Text, xs+10 y+8 h18 0x200, Adventure:
+		Gui, IBM_Home:Add, Edit, w40 x+3 ReadOnly vIBM_Route_Adventure gIBM_Generic_Setting_Int, % g_SF.Memory.ReadCurrentObjID()
+		Gui, IBM_Home:Add, Text, x+8 h18 0x200, Patron:
+		Gui, IBM_Home:Add, Edit, w20 x+3 ReadOnly vIBM_Route_Patron gIBM_Generic_Setting_Int, % g_SF.Memory.ReadPatronID()
+		this.AddToolTip("IBM_Route_Adventure", "The adventure ID (objective ID) of the adventure to be farmed, used to check the correct adventure is active when starting the script. Double-click to update from game")
+		this.AddToolTip("IBM_Route_Patron", "The patron ID of the adventure to be farmed, used to check the correct patron is active when starting the script. Double-click to update from game")
+		
+		GuiControlGet, lastItemPos, IBM_Home:Pos,IBM_Route_Patron ;Used for setting the next box
 		groupEnd:=lastItemPosY+lastItemPosH-nextGroupStart+8
 		GuiControl, IBM_Home:Move, IBM_Group_Route, h%groupEnd%
 		GuiControlGet, groupPos, IBM_Home:Pos,IBM_Group_Route ;Used for setting the next box
@@ -700,7 +729,7 @@
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w31 x+3 Number Limit4 vIBM_Online_Melf_Min gIBM_Generic_Setting_Int
 		this.AddToolTip("IBM_Online_Melf_Min","The farm will stack at the first stack zone greater than or equal to this")
 		Gui, IBM_Home:Add, Text, xs+10 y+5 h18 0x200, % "Farideh's ultimate trigger:"
-		Gui, IBM_Home:Add, DropDownList, cRed w110 x+3 AltSubmit vIBM_Online_Farideh_Condition gIBM_Generic_Setting_Int, Active enemies|Attacking enemies|Tatyana return
+		Gui, IBM_Home:Add, DropDownList, w110 x+3 AltSubmit vIBM_Online_Farideh_Condition gIBM_Generic_Setting_Int, Active enemies|Attacking enemies|Tatyana return
 		Gui, IBM_Home:Add, Text, x+3 h18 0x200, with threshold:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% x+3 w32 Number Limit4 vIBM_Online_Farideh_Threshold gIBM_Generic_Setting_Int
 		this.AddToolTip("IBM_Online_Farideh_Threshold","Use these options to tune Farideh's ultimate usage.`nFor Active enemies and Attacking enemies, this is the number of enemies at which Farideh's ultimate will be used when stacking.`nFor Tatyana return the number of game milliseconds remaining on her return timer after which the ultimate should be used, e.g. 1250ms at x12.5 will result in the ultimate being used 100ms real time before she returns")
@@ -718,9 +747,6 @@
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w30 x+3 Number Limit4 vIBM_OffLine_Sleep_Time gIBM_Generic_Setting_Int
 		Gui, IBM_Home:Add, Text, x+3 h18 0x200, ms
 		this.AddToolTip("IBM_OffLine_Sleep_Time", "The time to wait between the game closing and launching a new copy. This should only be increased from 0 if the lack of delay causes platform issues")
-		Gui, IBM_Home:Add, Text, x+15 h18 0x200, Timeout factor:
-		Gui, IBM_Home:Add, Edit, +%editTextColour% w20 x+3 Number Limit2 vIBM_OffLine_Timeout gIBM_Generic_Setting_Int
-		this.AddToolTip("IBM_OffLine_Timeout", "Controls the time allowed for the game to start and close. The start time is 10s times this value, and the initial close time is 2s times this value")
 		Gui, IBM_Home:Add, Text, xs+10 y+5 h18 0x200, Offline every:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w25 x+3 Number Limit3 vIBM_OffLine_Freq_Edit gIBM_OffLine_Freq_Edit
 		Gui, IBM_Home:Add, Text, x+5 h18 0x200, runs
@@ -761,7 +787,9 @@
 		Gui, IBM_Home:Add, Text, x+10 h18 0x200, Minimum cards:
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w15 x+3 Number Limit1 vIBM_Casino_MinCards_Base gIBM_Generic_Setting_Int
 
+    ;++++++++++++++++++++++++++++++++++++++++++++++++
 		;++++++++++++++++++ADVANCED TAB++++++++++++++++++
+    ;++++++++++++++++++++++++++++++++++++++++++++++++
 		Gui, IBM_Home:Tab, Advanced
 		Gui, IBM_Home:Font, w700
 		Gui, IBM_Home:Add, Groupbox, Section xm+2 ym+48 w%groupWidth% h150 vIBM_Group_Advanced, Advanced
@@ -779,7 +807,9 @@
 		Gui, IBM_Home:Add, Edit, +%editTextColour% w90 x+3 Number Limit9 vIBM_Online_Stack_Max_Time gIBM_Generic_Setting_Int
 		this.AddToolTip("IBM_Online_Stack_Max_Time", "Maximum online stack time before the run is restarted. This value is used in the same base unit as the runtime maxOnlineStackTime calculation.")
 
-		;++++++++++++++++++LEVELS TAB++++++++++++++++++
+		;++++++++++++++++++++++++++++++++++++++++++++
+		;+++++++++++++++++LEVELS TAB+++++++++++++++++
+		;++++++++++++++++++++++++++++++++++++++++++++
 		Gui, IBM_Home:Tab, Levels
 		;Levelling Options
 		Gui, IBM_Home:Font, w700
@@ -800,12 +830,7 @@
 		this.AddToolTip("IBM_Level_Options_Ghost", "During the Casino, level champions that are not part of the formation so long as they will not be placed, either due to all slots being full or the formation being under attack. This option makes it more likely all speed effects will be ready for the first normal zone. Only applied when Thellora is in the M formation")
 		Gui, IBM_Home:Add, CheckBox, x+5 h18 0x200 vIBM_Level_Diana_Cheese gIBM_Generic_Setting_Int, Dynamic Diana
 		this.AddToolTip("IBM_Level_Diana_Cheese", "Diana can give excess chests after the daily reset. This option will raise her level to 200 for Electrum Chest Scavenger from 3 minutes before the daily reset to 30 minutes after. Her level in the main options should be left at 100")
-		Gui, IBM_Home:Add, CheckBox, xs+10 y+8 h18 0x200 vIBM_Level_Options_BrivBoost_Use gIBM_Level_Options_BrivBoost_Use, Briv Level Boost
-		this.AddToolTip("IBM_Level_Options_BrivBoost_Use", "When enabled will increase Briv's level during online stacking. Use when Briv's normal level is insufficent for later stack zones")
-		Gui, IBM_Home:Add, Text, x+15 h18 0x200, Safety Factor
-		Gui, IBM_Home:Add, Edit, +%editTextColour% w20 x+1 Number Limit2 vIBM_LevelManager_Boost_Multi gIBM_Generic_Setting_Int
-		this.AddToolTip("IBM_LevelManager_Boost_Multi", "This is how many times greater Briv's HP should be than the incoming damage of 100 enemies. Useful range 8 (fast stacking) to 12 (slower stacking)")
-		Gui, IBM_Home:Add, CheckBox, x+15 h18 0x200 vIBM_Level_Recovery_Softcap gIBM_Generic_Setting_Int, Recovery Levelling
+		Gui, IBM_Home:Add, CheckBox, xs+10 y+8 h18 0x200 vIBM_Level_Recovery_Softcap gIBM_Generic_Setting_Int, Recovery Levelling
 		this.AddToolTip("IBM_Level_Recovery_Softcap", "With this option selected, champions will be levelled to their last update when reaching a boss zone in stack conversion recovery, that is when Briv has no stacks and the minimum stack zone has yet to be reached. This can aid killing armoured bosses, but will raise the minimum zone required to gain online stacks")
 		GuiControlGet, groupPos, IBM_Home:Pos,IBM_Group_Level_Options ;Used for setting the next box
 		nextGroupStart:=groupPosY+groupPosH+1
@@ -895,8 +920,8 @@
 	}
 
 	UpdateGUISettings()
-    {
-        this.controlLock:=true ;Prevent control g-labels messing things up whilst populating. This is particularly important when one label processes multiple controls, as it can read values out of yet-to-be-populated controls and thus blank that setting
+	{
+		this.controlLock:=true ;Prevent control g-labels messing things up whilst populating. This is particularly important when one label processes multiple controls, as it can read values out of yet-to-be-populated controls and thus blank that setting
 
 		;BRIV MASTER TAB
 
@@ -915,6 +940,9 @@
 		GuiControl, IBM_Home:, IBM_Game_Path, % g_IBM_Settings.IBM_Game_Path
 		GuiControl, IBM_Home:, IBM_Game_Launch, % g_IBM_Settings.IBM_Game_Launch
 		GuiControl, IBM_Home:, IBM_Game_Hide_Launcher, % g_IBM_Settings.IBM_Game_Hide_Launcher
+		GuiControl, IBM_Home:, IBM_Game_Hide_Launcher_Startup, % g_IBM_Settings.HUB.IBM_Game_Hide_Launcher_Startup
+		GuiControl, IBM_Home:Choose,IBM_Game_Platform_ID, % g_IriBrivMaster.GetPlatformIndexByID(g_IBM_Settings.HUB.IBM_Game_Platform_ID)
+		
 		;Window
 		GuiControl, IBM_Home:, IBM_Window_X, % g_IBM_Settings.IBM_Window_X
 		GuiControl, IBM_Home:, IBM_Window_Y, % g_IBM_Settings.IBM_Window_Y
@@ -942,6 +970,8 @@
 		GuiControl, IBM_Home:, IBM_Route_BrivJump_Q, % g_IBM_Settings.IBM_Route_BrivJump_Q
 		GuiControl, IBM_Home:, IBM_Route_BrivJump_E, % g_IBM_Settings.IBM_Route_BrivJump_E
 		GuiControl, IBM_Home:, IBM_Route_BrivJump_M, % g_IBM_Settings.IBM_Route_BrivJump_M
+		GuiControl, IBM_Home:, IBM_Route_Adventure, % g_IBM_Settings.IBM_Route_Adventure
+		GuiControl, IBM_Home:, IBM_Route_Patron, % g_IBM_Settings.IBM_Route_Patron
 		;Stacking Zone
 		GuiControl, IBM_Home:, IBM_Offline_Stack_Zone, % g_IBM_Settings.IBM_Offline_Stack_Zone
 		GuiControl, IBM_Home:, IBM_OffLine_Stack_Min, % g_IBM_Settings.IBM_Offline_Stack_Min
@@ -957,7 +987,6 @@
 		GuiControl, IBM_Home:, IBM_OffLine_Blank_Stop, % g_IBM_Settings.IBM_OffLine_Blank_Stop
 		GuiControl, IBM_Home:, IBM_OffLine_Blank_Relay_Zones, % g_IBM_Settings.IBM_OffLine_Blank_Relay_Zones
 		IBM_Offline_Blank_EnableControls(g_IBM_Settings.IBM_OffLine_Blank,g_IBM_Settings.IBM_OffLine_Blank_Relay)
-		GuiControl, IBM_Home:, IBM_OffLine_Timeout, % g_IBM_Settings.IBM_OffLine_Timeout
 		GuiControl, IBM_Home:, IBM_Route_Offline_Restore_Window, % g_IBM_Settings.IBM_Route_Offline_Restore_Window
 		;Ellywick's Casino
 		GuiControl, IBM_Home:, IBM_Casino_Target_Base, % g_IBM_Settings.IBM_Casino_Target_Base
@@ -973,9 +1002,6 @@
 
 		;Levelling options
 		GuiControl, IBM_Home:, IBM_LevelManager_Input_Max, % g_IBM_Settings.IBM_LevelManager_Input_Max
-		GuiControl, IBM_Home:, IBM_Level_Options_BrivBoost_Use, % g_IBM_Settings.IBM_LevelManager_Boost_Use
-		GuiControl, IBM_Home:, IBM_LevelManager_Boost_Multi, % g_IBM_Settings.IBM_LevelManager_Boost_Multi
-		IBM_Level_Options_BrivBoost_Enable(g_IBM_Settings.IBM_LevelManager_Boost_Use)
 		GuiControl, IBM_Home:, IBM_Level_Options_Suppress_Front, % g_IBM_Settings.IBM_Level_Options_Suppress_Front
 		GuiControl, IBM_Home:, IBM_Level_Options_Ghost, % g_IBM_Settings.IBM_Level_Options_Ghost
 		GuiControl, IBM_Home:ChooseString, IBM_Level_Options_Mod_Key, % g_IBM_Settings.IBM_Level_Options_Mod_Key
@@ -986,7 +1012,7 @@
 		this.RefreshLevelRows()
 
 		this.controlLock:=false
-    }
+	}
 
 	UpdateChestSnatcherOptions() ;ChestSnatcher options in a separate function so that the window can be updated when opened to overwrite unaccepted changes
 	{
@@ -1331,9 +1357,15 @@
 		loop, 5
 		{
 			GuiControlGet, value,, IBM_NonGemFarm_Elly_Min_%A_Index%
-			cardOptions.Push(value+0)
+			if value is integer
+				cardOptions.Push(value+0)
+			else
+				cardOptions.Push(0)
 			GuiControlGet, value,, IBM_NonGemFarm_Elly_Max_%A_Index%
-			cardOptions.Push(value+0)
+			if value is integer
+				cardOptions.Push(value+0)
+			else
+				cardOptions.Push(0)
 		}
 		return cardOptions
 	}
@@ -1350,9 +1382,9 @@
 		}
 	}
 	
-    AddToolTip(controlVariableName, tipMessage) ;Used to pre-add tooltips before the GUI is shown. Will not be displayed until ApplyTooltips() is called
-    {
-        if(g_MouseToolTips.ByName.HasKey(controlVariableName))
+	AddToolTip(controlVariableName, tipMessage) ;Used to pre-add tooltips before the GUI is shown. Will not be displayed until ApplyTooltips() is called
+	{
+		if(g_MouseToolTips.ByName.HasKey(controlVariableName))
 			g_MouseToolTips.ByName[controlVariableName].Tip:=tipMessage
 		else 
 		{
@@ -1360,7 +1392,7 @@
 			newTip.Tip:=tipMessage
 			g_MouseToolTips.ByName[controlVariableName]:=newTip
 		}
-    }
+	}
 
 	UpdateToolTip(controlVariableName, tipMessage) ;Used to update a tooltip once the GUI has been shown. Will add if needed
 	{
@@ -1391,12 +1423,12 @@
 		}
 	}
 
-    AddTab(Tabname)
+	AddTab(Tabname)
 	{
-        addedTabs:=Tabname . "|"
-        GuiControl,IBM_Home:,ModronTabControl,% addedTabs
-        g_TabList.=addedTabs
-    }
+		addedTabs:=Tabname . "|"
+		GuiControl,IBM_Home:,ModronTabControl,% addedTabs
+		g_TabList.=addedTabs
+	}
 	
 	GetThemeColourEntries()
 	{
@@ -1445,7 +1477,7 @@ IBM_Generic_Setting_Int() ;Generic g-label for non-hub settings that should be f
 	if (g_IriBrivMaster_GUI.controlLock)
 		return
 	GuiControlGet, value, , %A_GuiControl%
-    g_IBM_Settings[A_GuiControl]:=value+0
+	g_IBM_Settings[A_GuiControl]:=value+0
 }
 
 IBM_Generic_Setting_String() ;Generic g-label for non-hub settings that should be forced to String
@@ -1453,7 +1485,7 @@ IBM_Generic_Setting_String() ;Generic g-label for non-hub settings that should b
 	if (g_IriBrivMaster_GUI.controlLock)
 		return
 	GuiControlGet, value, , %A_GuiControl%
-    g_IBM_Settings[A_GuiControl]:=value . ""
+	g_IBM_Settings[A_GuiControl]:=value . ""
 }
 
 IBM_Generic_Setting_Float() ;Generic g-label for non-hub settings that should be forced to Float and capped at 2 decimal places
@@ -1470,7 +1502,7 @@ IBM_Generic_Hub_Setting_Int() ;Hub version
 	if (g_IriBrivMaster_GUI.controlLock)
 		return
 	GuiControlGet, value, , %A_GuiControl%
-    g_IBM_Settings.HUB[A_GuiControl]:=value+0
+	g_IBM_Settings.HUB[A_GuiControl]:=value+0
 }
 
 /*
@@ -1479,11 +1511,53 @@ IBM_Generic_Hub_Setting_String() ;Hub version - not currently in use as all stri
 	if (g_IriBrivMaster_GUI.controlLock)
 		return
 	GuiControlGet, value, , %A_GuiControl%
-    g_IBM_Settings.HUB[A_GuiControl]:=value . ""
+	g_IBM_Settings.HUB[A_GuiControl]:=value . ""
 }
 */
 
+;GUI double-click handler TODO: Have a system where controls register for this? An if stack (or select case) will get ugly if I start using it more often
+
+DoubleClickHandler()
+{
+	if(A_GuiControl=="IBM_Route_Adventure")
+	{
+		if(g_SF.Memory.ReadGameStarted()!=1)
+			g_IriBrivMaster.RefreshUserData()
+		value:=g_SF.Memory.ReadCurrentObjID()
+		if value is integer
+		{
+			GuiControl, IBM_Home:, IBM_Route_Adventure, % value
+			g_MouseTooltips.Enabled:=false ;Disable normal tooltips so they do not immediately overwrite this one
+			ToolTip % "Updated Adventure to " . value
+			SetTimer, HideToolTipAndEnable, -3000
+		}
+		else
+			Msgbox 16, Briv Master, % "Unable to read valid adventure ID.`nMemory value [" . value "]"
+	}
+	else if(A_GuiControl=="IBM_Route_Patron")
+	{
+		if(g_SF.Memory.ReadGameStarted()!=1)
+			g_IriBrivMaster.RefreshUserData()
+		value:=g_SF.Memory.ReadPatronID()
+		if value is integer
+		{			
+			GuiControl, IBM_Home:, IBM_Route_Patron, % value
+			g_MouseTooltips.Enabled:=false ;Disable normal tooltips so they do not immediately overwrite this one
+			ToolTip % "Updated Patron to " . value
+			SetTimer, HideToolTipAndEnable, -3000
+		}
+		else
+			Msgbox 16, Briv Master, % "Unable to read valid patron ID.`nMemory value [" . value "]"
+	}
+}
+
 ;Specific g-label handlers
+
+IBM_Game_Platform_ID() ;Translate the AltSubmit index to a platform ID
+{
+	GuiControlGet, value, , IBM_Game_Platform_ID
+	g_IBM_Settings.HUB["IBM_Game_Platform_ID"]:=g_IriBrivMaster.PlatformTable[value].ID
+}
 
 IBM_Theme_Manager_Load_Light()
 {
@@ -1654,17 +1728,17 @@ IBM_LevelRow_Feats_Clear()
 
 IBM_MainButtons_Start()
 {
-    g_IriBrivMaster.Run_Clicked()
+	g_IriBrivMaster.Run_Clicked()
 }
 
 IBM_MainButtons_Stop()
 {
-    g_IriBrivMaster.Stop_Clicked()
+	g_IriBrivMaster.Stop_Clicked()
 }
 
 IBM_MainButtons_Connect()
 {
-    g_IriBrivMaster.Connect_Clicked()
+	g_IriBrivMaster.Connect_Clicked()
 }
 
 IBM_MainButtons_Reset()
@@ -1742,7 +1816,10 @@ IBM_Game_Copy_From_Game() ;Copy game location settings from the running game. No
 	if(hWnd) ;A game window exists TODO: We need to make more effort to set up and check memory reads here
 	{
 		location:=IBM_Game_Copy_From_Game_Location_Helper(useExe) . "\" ;Trailing \ is removed
-		if (g_SF.Memory.ReadPlatform()==21) ;21 is the EGS platform code
+		if(g_SF.Memory.ReadGameStarted()!=1)
+			g_IriBrivMaster.RefreshUserData()
+		platformID:=g_SF.Memory.ReadPlatform()
+		if (platformID==21) ;21 is the EGS platform code
 		{
 			Msgbox 36, Briv Master, Use standard Epic Games Store Launcher?`nSelect No for Legendary or Rare ;32 is question, 4 is Yes/No
 			IfMsgBox Yes
@@ -1763,6 +1840,7 @@ IBM_Game_Copy_From_Game() ;Copy game location settings from the running game. No
 		GuiControl, IBM_Home:, IBM_Game_Exe, % useExe
 		GuiControl, IBM_Home:, IBM_Game_Path, % location
 		GuiControl, IBM_Home:, IBM_Game_Launch, % launch
+		GuiControl, IBM_Home:Choose,IBM_Game_Platform_ID, % g_IriBrivMaster.GetPlatformIndexByID(platformID)
 		IBM_Game_Location_Settings()
 	}
 	else
@@ -1797,8 +1875,6 @@ IBM_Game_Location_Settings() ;TODO: Should be able to use the generic Int for th
 	g_IriBrivMaster.UpdateSetting("IBM_Game_Path",value)
 	GuiControlGet, value,, IBM_Game_Launch
 	g_IriBrivMaster.UpdateSetting("IBM_Game_Launch",value)
-	GuiControlGet, value,, IBM_Game_Hide_Launcher
-	g_IriBrivMaster.UpdateSetting("IBM_Game_Hide_Launcher",value+0)
 }
 
 IBM_Game_Settings_Profile()
@@ -1969,25 +2045,6 @@ IBM_LevelManager_Input_Max()
 	g_IriBrivMaster.UpdateSetting("IBM_LevelManager_Input_Max",value)
 }
 
-IBM_Level_Options_BrivBoost_Use()
-{
-	GuiControlGet, value,, IBM_Level_Options_BrivBoost_Use
-	IBM_Level_Options_BrivBoost_Enable(value)
-	g_IriBrivMaster.UpdateSetting("IBM_LevelManager_Boost_Use",value)
-}
-
-IBM_Level_Options_BrivBoost_Enable(enableControl)
-{
-	if (enableControl)
-	{
-		GuiControl, IBM_Home:Enable, IBM_LevelManager_Boost_Multi
-	}
-	else
-	{
-		GuiControl, IBM_Home:Disable, IBM_LevelManager_Boost_Multi
-	}
-}
-
 IBM_Route_Import_Button() ;TODO: Provide some instructions...
 {
 	InputBox routeString, Route Import,,,,100,,,,, ;InputBox, OutputVar , Title, Prompt, Hide, Width, Height, X, Y, Locale, Timeout, Default
@@ -2032,7 +2089,7 @@ IBM_LevelManager_Refresh() ;UI refresh button
 
 class IBM_Theme
 {
-    __new(themeSettings:="")
+	__new(themeSettings:="")
 	{
 		this.defaultFontSize:=8
 		if(themeSettings)
@@ -2045,41 +2102,41 @@ class IBM_Theme
 		this.Stock["Dark"]:={"DefaultText":"C0C0C0","WarningText":"F18500","SpecialText1":"8888FF","SpecialText2":"88FF88","TableText":"E0E0E0","EditText":"333333","TableBackground":"555555","WindowBackground":"333333","TrafficLightBad":"F00000","TrafficLightGood":"00F000","TrafficLightNeutral":"FFC000","DarkMode":true}
 	}
 	
-    UseThemeTextColour(guiName, textType:="DefaultText", weight:=400) ;Sets the colour/weight for subsequent text based on the theme
-    {
-        textColor:=Format("{:#x}", this.Theme[textType])
-        Gui, %guiName%:Font, % "c" . textColor . " w" . weight . " s" . this.defaultFontSize
-    }
+	UseThemeTextColour(guiName, textType:="DefaultText", weight:=400) ;Sets the colour/weight for subsequent text based on the theme
+	{
+		textColor:=Format("{:#x}", this.Theme[textType])
+		Gui, %guiName%:Font, % "c" . textColor . " w" . weight . " s" . this.defaultFontSize
+	}
 	
 	GetThemeTextColour(textType:="DefaultText") ;Returns the colour value, including the 'c' prefix, for a theme colour. Needed when changing text colour dynamically
-    {
-        return "c" . Format("{:#x}", this.Theme[textType])
-    }
+	{
+		return "c" . Format("{:#x}", this.Theme[textType])
+	}
 
 	GetThemeBackgroundColour()
-    {
-        return Format("{:#x}", this.Theme["WindowBackground"]) ;No 'c' prefix here
-    }
+	{
+		return Format("{:#x}", this.Theme["WindowBackground"]) ;No 'c' prefix here
+	}
 
 	GetThemeListViewBackgroundColour()
-    {
+	{
 		return Format("{:#x}", this.Theme["TableBackground"]) ;No 'c' prefix here
-    }
+	}
 
-    UseThemeTitleBar(guiName) ;Sets the window title bar to dark if theme is a dark theme. GUI must be shown before calling.
-    {
-        if(this.Theme.DarkMode)
-        {
-            if (A_OSVersion>="10.0.17763" AND SubStr(A_OSVersion, 1, 3)="10.")
-            {
-                attr:=19
-                if (A_OSVersion>="10.0.18985")
-                    attr:=20
-                Gui, %guiName%: +hwndGuiID
-                DllCall("dwmapi\DwmSetWindowAttribute", "ptr", GuiID, "int", attr, "int*", true, "int", 4)             
-            }
-        }
-    }
+	UseThemeTitleBar(guiName) ;Sets the window title bar to dark if theme is a dark theme. GUI must be shown before calling.
+	{
+		if(this.Theme.DarkMode)
+		{
+			if (A_OSVersion>="10.0.17763" AND SubStr(A_OSVersion, 1, 3)="10.")
+			{
+				attr:=19
+				if (A_OSVersion>="10.0.18985")
+					attr:=20
+				Gui, %guiName%: +hwndGuiID
+				DllCall("dwmapi\DwmSetWindowAttribute", "ptr", GuiID, "int", attr, "int*", true, "int", 4)             
+			}
+		}
+	}
 	
 	GetThemeHexString(colourName:="DefaultText") ;Returns the actual hex, without a c prefix or 0x prefix, e.g. pure red would give "FF0000"
 	{
